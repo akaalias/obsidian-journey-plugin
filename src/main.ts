@@ -27,6 +27,7 @@ export default class MyPlugin extends Plugin {
 		// get md files
 		let mdFiles = this.app.vault.getMarkdownFiles();
 
+		// configure directed true/false
 		var g = new Graph({ directed: true, compound: false, multigraph: true });
 
 		for (const md of mdFiles) {
@@ -143,7 +144,7 @@ class ResultsModal extends Modal {
 
 			contentEl.appendChild(button)
 
-			let anotherSearch = contentEl.createEl("p", {text: "Start another search"});
+			let anotherSearch = contentEl.createEl("p", {text: "Start another search", cls: 'journey-result-list-reset-link'});
 
 			var boundFunctionAnotherSearch = (function() {
 				this.close();

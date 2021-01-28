@@ -40,3 +40,8 @@
     background-color: darkred;
     border: 3px solid brown;
 }
+
+.journey-result-list-reset-link {
+    color: #ccc;
+    text-align: center;
+}
