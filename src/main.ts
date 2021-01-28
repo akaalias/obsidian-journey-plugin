@@ -3,25 +3,35 @@ import { Graph } from 'graphlib';
 import * as graphlib from "graphlib";
 
 export default class MyPlugin extends Plugin {
-	async onload() {
+	private searchModal: SearchModal;
+	private resultsModal: ResultsModal;
 
+	async onload() {
+		this.resultsModal = new ResultsModal(this.app, this);
+		this.searchModal = new SearchModal(this.app, this);
 		this.addStatusBarItem().setText('');
 
 		this.addRibbonIcon('dot-network', 'Find Journey', () => {
-			this.findShortestPath();
+			this.searchModal.open();
 		});
 	}
 
 	onunload() {
 	}
 
-	private async findShortestPath() {
+	public async findShortestPath(start: string, end: string) {
+
+		const startBasename = start;
+		const endBasename = end;
+
+		console.log("Searching for journey between " + startBasename + " and " + endBasename);
+
 		// get md files
 		let mdFiles = this.app.vault.getMarkdownFiles();
 
 		var g = new Graph({ directed: true, compound: false, multigraph: true });
 
-		console.log("Starting adding md files.")
+		// console.log("Starting adding md files.")
 
 		for (const md of mdFiles) {
 			const nodeBasename = md.basename;
@@ -45,34 +55,83 @@ export default class MyPlugin extends Plugin {
 			// open and find links
 			// add links as edges
 		}
-		console.log("Finished adding md files.")
+		// console.log("Finished adding md files.")
 
-		console.log("Node count: " + g.nodeCount());
-		console.log("Edge count: " + g.edgeCount());
-
-		const startBasename = "Free Bouncing";
-		const endBasename = "Obsidian Plugin Development"
+		// console.log("Node count: " + g.nodeCount());
+		// console.log("Edge count: " + g.edgeCount());
 
 		const searchResult = graphlib.alg.dijkstra(g, startBasename);
 
-		console.log(searchResult[endBasename]);
+		let finalList = new Array();
 
-
-		if(searchResult[endBasename].distance !== Infinity) {
-			let finalList = new Array();
+		if(searchResult[endBasename] !== undefined && searchResult[endBasename].distance !== Infinity) {
 			let step = searchResult[endBasename];
 			finalList.push(endBasename);
 
 			while(step.distance != 0) {
-				console.log("Looking at " + step.predecessor);
 				finalList.push(step.predecessor);
 				step = 	searchResult[step.predecessor];
 			}
-
-			console.log(finalList);
-
-		} else {
-			console.log("Could not find a path");
 		}
+
+		this.searchModal.close();
+		this.resultsModal.results = finalList;
+		this.resultsModal.open();
+	}
+}
+
+class SearchModal extends Modal {
+	private plugin;
+
+	constructor(app: App, plugin: MyPlugin) {
+		super(app);
+		this.plugin = plugin;
+	}
+
+	onOpen() {
+		let {contentEl} = this;
+		contentEl.createEl("h2", {text: "Find Path Between Two Notes"});
+
+		contentEl.createEl("label", {text: "Start Note"});
+		let start = contentEl.createEl('input', {type: "text", cls: 'journey-input-text'});
+		contentEl.createEl("br")
+		contentEl.createEl("label", {text: "End Note"});
+		let end = contentEl.createEl('input', {type: "text", cls: 'journey-input-text'});
+		contentEl.createEl("hr")
+		let button = contentEl.createEl('input', {type: 'submit'});
+
+		var boundFunction = (function() {
+			contentEl.replaceWith(contentEl.createEl("h2", {text: "Searching..."}));
+			this.plugin.findShortestPath(start.value, end.value);
+		}).bind(this);
+
+		button.onclick = boundFunction;
+	}
+
+	onClose() {
+		let {contentEl} = this;
+		contentEl.empty();
+	}
+}
+
+class ResultsModal extends Modal {
+	private plugin;
+	public results;
+
+	constructor(app: App, plugin: MyPlugin) {
+		super(app);
+		this.plugin = plugin;
+	}
+
+	onOpen() {
+		let {contentEl} = this;
+		let message = "Results";
+		contentEl.createEl("h2", {text: "Results"});
+		if(this.results.length > 0) {
+
+		}
+		this.results.forEach(function(x) {
+			contentEl.createDiv(x);
+		});
 	}
 }
