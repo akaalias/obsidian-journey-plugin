@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Modal, Notice, Plugin } from 'obsidian';
 import { Graph } from 'graphlib';
 import * as graphlib from "graphlib";
 
@@ -31,34 +31,18 @@ export default class MyPlugin extends Plugin {
 
 		var g = new Graph({ directed: true, compound: false, multigraph: true });
 
-		// console.log("Starting adding md files.")
-
 		for (const md of mdFiles) {
 			const nodeBasename = md.basename;
-			// add to graph as node
-			// console.log("Adding " + nodeBasename);
-
 			g.setNode(nodeBasename);
 
-			// find links
 			let text = await this.app.vault.adapter.read(md.path);
 			const result = text.matchAll(/\[\[(\w.*)\]\]/gi); // only clean links for now
 			const r = Array.from(result);
-
-			// console.log("   Adding " + r.length + " links for " + nodeBasename + ":");
-
 			r.forEach(function(x) {
 				const target = x[1];
-				// console.log("       " + target);
 				g.setEdge(nodeBasename, target);
 			});
-			// open and find links
-			// add links as edges
 		}
-		// console.log("Finished adding md files.")
-
-		// console.log("Node count: " + g.nodeCount());
-		// console.log("Edge count: " + g.edgeCount());
 
 		const searchResult = graphlib.alg.dijkstra(g, startBasename);
 
@@ -73,8 +57,9 @@ export default class MyPlugin extends Plugin {
 				step = 	searchResult[step.predecessor];
 			}
 		}
-
 		this.searchModal.close();
+		this.searchModal = new SearchModal(this.app, this);
+		this.resultsModal = new ResultsModal(this.app, this);
 		this.resultsModal.results = finalList;
 		this.resultsModal.open();
 	}
@@ -93,12 +78,11 @@ class SearchModal extends Modal {
 		contentEl.createEl("h2", {text: "Find Path Between Two Notes"});
 
 		contentEl.createEl("label", {text: "Start Note"});
-		let start = contentEl.createEl('input', {type: "text", cls: 'journey-input-text'});
+		let start = contentEl.createEl('input', {text: "Creative Remixing", type: "text", cls: 'journey-input-text'});
 		contentEl.createEl("br")
 		contentEl.createEl("label", {text: "End Note"});
-		let end = contentEl.createEl('input', {type: "text", cls: 'journey-input-text'});
-		contentEl.createEl("hr")
-		let button = contentEl.createEl('input', {type: 'submit'});
+		let end = contentEl.createEl('input', {text: "Huel", type: "text", cls: 'journey-input-text'});
+		let button = contentEl.createEl('input', {type: 'submit', cls: 'journey-input-button', value: 'Find Journey'});
 
 		var boundFunction = (function() {
 			contentEl.replaceWith(contentEl.createEl("h2", {text: "Searching..."}));
@@ -124,14 +108,59 @@ class ResultsModal extends Modal {
 	}
 
 	onOpen() {
+		console.log(this.results);
 		let {contentEl} = this;
-		let message = "Results";
-		contentEl.createEl("h2", {text: "Results"});
-		if(this.results.length > 0) {
+		contentEl.createEl("h2", {text: "Results:"})
 
+		if(this.results.length <= 0) {
+			contentEl.replaceWith(contentEl.createEl("h2", {text: "No Path Found."}));
+		} else {
+			let list = createDiv({cls: 'journey-result-list'});
+
+			let reversedResults = this.results.reverse();
+			for(var i = 0; i < reversedResults.length; i++) {
+				let text = reversedResults[i];
+				let cls = "journey-result-list-item";
+
+				if(i == 0) cls = "journey-result-list-item-start";
+				if(i == reversedResults.length - 1) cls = "journey-result-list-item-end";
+
+				list.appendChild(createDiv({text: text, cls: cls}))
+			}
+			contentEl.appendChild(list);
+
+			let button = contentEl.createEl('input', {type: 'submit', cls: 'journey-input-button', value: 'Copy to Clipboard'});
+			var boundFunction = (function() {
+				this.saveToClipboard();
+			}).bind(this);
+
+			button.onclick = boundFunction;
+
+			contentEl.appendChild(contentEl.createEl("hr"));
+
+			contentEl.appendChild(button)
 		}
+	}
+
+	onClose() {
+		let {contentEl} = this;
+		contentEl.empty();
+	}
+
+	saveToClipboard() {
+		if (this.results.length > 0) {
+			navigator.clipboard.writeText(this.createClipboardContent());
+			new Notice("Journey copied to clipboard!");
+		}
+	}
+
+	createClipboardContent(): string {
+		let result = "## The Journey Between " + this.results.first()  + " and " + this.results.last() + "\n";
+
 		this.results.forEach(function(x) {
-			contentEl.createDiv(x);
+			result += "- " + x + "\n";
 		});
+
+		return result;
 	}
 }
