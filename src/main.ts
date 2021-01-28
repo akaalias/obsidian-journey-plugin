@@ -7,12 +7,10 @@ export default class MyPlugin extends Plugin {
 	private resultsModal: ResultsModal;
 
 	async onload() {
-		this.resultsModal = new ResultsModal(this.app, this);
-		this.searchModal = new SearchModal(this.app, this);
 		this.addStatusBarItem().setText('');
 
 		this.addRibbonIcon('dot-network', 'Find Journey', () => {
-			this.searchModal.open();
+			this.startSearch();
 		});
 	}
 
@@ -63,6 +61,11 @@ export default class MyPlugin extends Plugin {
 		this.resultsModal.results = finalList;
 		this.resultsModal.open();
 	}
+
+	public startSearch() {
+		this.searchModal = new SearchModal(this.app, this);
+		this.searchModal.open();
+	}
 }
 
 class SearchModal extends Modal {
@@ -78,10 +81,10 @@ class SearchModal extends Modal {
 		contentEl.createEl("h2", {text: "Find Path Between Two Notes"});
 
 		contentEl.createEl("label", {text: "Start Note"});
-		let start = contentEl.createEl('input', {text: "Creative Remixing", type: "text", cls: 'journey-input-text'});
+		let start = contentEl.createEl('input', {text: "Creative Remixing", type: "text", cls: 'journey-input-text journey-input-text-start'});
 		contentEl.createEl("br")
 		contentEl.createEl("label", {text: "End Note"});
-		let end = contentEl.createEl('input', {text: "Huel", type: "text", cls: 'journey-input-text'});
+		let end = contentEl.createEl('input', {text: "Huel", type: "text", cls: 'journey-input-text journey-input-text-end'});
 		let button = contentEl.createEl('input', {type: 'submit', cls: 'journey-input-button', value: 'Find Journey'});
 
 		var boundFunction = (function() {
@@ -130,15 +133,26 @@ class ResultsModal extends Modal {
 			contentEl.appendChild(list);
 
 			let button = contentEl.createEl('input', {type: 'submit', cls: 'journey-input-button', value: 'Copy to Clipboard'});
-			var boundFunction = (function() {
+			var boundFunctionButton = (function() {
 				this.saveToClipboard();
 			}).bind(this);
 
-			button.onclick = boundFunction;
+			button.onclick = boundFunctionButton;
 
 			contentEl.appendChild(contentEl.createEl("hr"));
 
 			contentEl.appendChild(button)
+
+			let anotherSearch = contentEl.createEl("p", {text: "Start another search"});
+
+			var boundFunctionAnotherSearch = (function() {
+				this.close();
+				this.plugin.startSearch();
+			}).bind(this);
+
+			anotherSearch.onclick = boundFunctionAnotherSearch;
+
+			contentEl.appendChild(anotherSearch);
 		}
 	}
 

@@ -7,6 +7,16 @@
     margin-bottom: 20px;
 }
 
+.journey-input-text-start {
+    background-color: darkgreen;
+    border: 3px solid forestgreen;
+}
+
+.journey-input-text-end {
+    background-color: darkgreen;
+    border: 3px solid forestgreen;
+}
+
 .journey-input-button {
     background-color: black;
     color: white;
@@ -14,15 +24,19 @@
 
 .journey-result-list-item, .journey-result-list-item-start, .journey-result-list-item-end {
     font-size: 24px;
-    padding: 5px;
-    margin-bottom: 5px;
-    background-color: black;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #555;
+    border: 5px solid #777;
+    border-radius: 10px 10px 10px 10px;
 }
 
 .journey-result-list-item-start {
-    border: 1px solid darkgreen;
+    background-color: darkgreen;
+    border: 3px solid forestgreen;
 }
 
 .journey-result-list-item-end {
-    border: 1px solid darkred;
+    background-color: darkred;
+    border: 3px solid brown;
 }
