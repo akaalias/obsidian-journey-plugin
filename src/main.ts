@@ -41,10 +41,11 @@ export default class MyPlugin extends Plugin {
 			const nodeBasename = md.basename;
 			g.setNode(nodeBasename);
 
+			// console.log("Creating node " + nodeBasename);
 			let text = await this.app.vault.adapter.read(md.path);
 
 			// @ts-ignore
-			const result = text.matchAll(/\[\[([a-zA-Z0-9\ \#\^\|]*)\]\]/gmi); // only clean links for now
+			const result = text.matchAll(/\[\[([a-zA-Z0-9\ \#\^\|\,\.\“\'\-\–]*)\]\]/gmi); // only clean links for now
 			const r = Array.from(result);
 
 			r.forEach(function(x) {
@@ -55,13 +56,19 @@ export default class MyPlugin extends Plugin {
 				if(target.indexOf("|") != -1) target = target.substring(0, target.indexOf("|"))
 				if(target.indexOf("^") != -1) target = target.substring(0, target.indexOf("^"))
 
+				// console.log("     Adding edge to " + target);
 				g.setEdge(nodeBasename, target);
 			});
 		}
 
+		// const components = graphlib.alg.components(g);
+		// console.log(components);
+
 		const searchResult = graphlib.alg.dijkstra(g, startBasename);
 
 		let finalList = new Array();
+
+		// console.log(searchResult);
 
 		if(searchResult[endBasename] !== undefined && searchResult[endBasename].distance !== Infinity) {
 			let step = searchResult[endBasename];
@@ -76,6 +83,8 @@ export default class MyPlugin extends Plugin {
 		this.searchModal = new SearchModal(this.app, this);
 		this.resultsModal = new ResultsModal(this.app, this);
 		this.resultsModal.results = finalList;
+		this.resultsModal.startBasename = startBasename;
+		this.resultsModal.endBasename = endBasename;
 		this.resultsModal.open();
 	}
 
@@ -130,7 +139,10 @@ class SearchModal extends Modal {
 
 class ResultsModal extends Modal {
 	private plugin;
+	// @ts-ignore
 	public results;
+	public startBasename: string;
+	public endBasename: string;
 
 	constructor(app: App, plugin: MyPlugin) {
 		super(app);
@@ -138,7 +150,7 @@ class ResultsModal extends Modal {
 	}
 
 	onOpen() {
-		console.log(this.results);
+		// console.log(this.results);
 		let {contentEl} = this;
 
 		let anotherSearch = contentEl.createEl("p", {text: "Start another search", cls: 'journey-result-list-reset-link'});
@@ -152,7 +164,7 @@ class ResultsModal extends Modal {
 
 		if(this.results.length <= 0) {
 			let noSearchResult = createDiv();
-			noSearchResult.appendChild(createEl("h2", {text: "No Path Found."}));
+			noSearchResult.appendChild(createEl("h2", {text: "No Path Found between " + this.startBasename + " and " + this.endBasename}));
 			noSearchResult.appendChild(anotherSearch);
 			contentEl.replaceWith(noSearchResult);
 		} else {
@@ -200,6 +212,7 @@ class ResultsModal extends Modal {
 	createClipboardContent(): string {
 		let result = "## The Journey Between " + this.results.first()  + " and " + this.results.last() + "\n";
 
+		// @ts-ignore
 		this.results.forEach(function(x) {
 			result += "- " + x + "\n";
 		});
