@@ -1,4 +1,4 @@
-import {addIcon, App, DropdownComponent, Modal, Notice, Plugin, Setting} from 'obsidian';
+import {addIcon, App, DropdownComponent, Modal, Notice, Plugin, PluginSettingTab, Setting} from 'obsidian';
 import { Graph } from 'graphlib';
 import * as graphlib from "graphlib";
 
@@ -9,12 +9,14 @@ addIcon('journey', '<svg width="100" height="100" viewBox="0 0 100 100" fill="no
 	'<path fill-rule="evenodd" clip-rule="evenodd" d="M96 24C96 32.2843 89.2843 39 81 39C77.6001 39 74.4644 37.8689 71.9487 35.9624L61.0884 46.8227C61.6736 48.0939 62 49.5088 62 51C62 56.5228 57.5228 61 52 61C50.5088 61 49.0939 60.6736 47.8227 60.0884L34.3813 73.5297C35.4934 75.1521 36.2948 77.0041 36.6999 79H73.414C74.7199 74.383 78.9649 71 84 71C90.0751 71 95 75.9249 95 82C95 88.0751 90.0751 93 84 93C78.9649 93 74.7199 89.617 73.414 85H36.6999C35.3101 91.8467 29.2569 97 22 97C13.7157 97 7 90.2843 7 82C7 73.7157 13.7157 67 22 67C24.9714 67 27.741 67.864 30.0713 69.3545L43.3702 56.0556C42.4993 54.5722 42 52.8444 42 51C42 45.4772 46.4771 41 52 41C53.8444 41 55.5722 41.4993 57.0556 42.3702L67.9771 31.4486C67.1959 30.0857 66.6225 28.5884 66.3001 27H37.5859C36.2801 31.617 32.0351 35 27 35C20.9249 35 16 30.0751 16 24C16 17.9249 20.9249 13 27 13C32.0351 13 36.2801 16.383 37.5859 21H66.3001C67.6899 14.1533 73.7431 9 81 9C89.2843 9 96 15.7157 96 24Z" fill="white" fill-opacity="0.4"/>\n' +
 	'</svg>\n');
 
-export default class MyPlugin extends Plugin {
+export default class JourneyPlugin extends Plugin {
 	private searchModal: SearchModal;
 	private resultsModal: ResultsModal;
+	public settings: JourneyPluginSettings;
 
 	async onload() {
-		this.addStatusBarItem().setText('');
+		this.loadSettings();
+		this.addSettingTab(new JourneyPluginSettingsTab(this.app, this));
 
 		this.addRibbonIcon('journey', 'Find Journey', () => {
 			this.startSearch();
@@ -35,20 +37,22 @@ export default class MyPlugin extends Plugin {
 		let mdFiles = this.app.vault.getMarkdownFiles();
 
 		// configure directed true/false
-		var g = new Graph({ directed: true, compound: false, multigraph: true });
+		var g = new Graph({ });
 
 		for (const md of mdFiles) {
 			const nodeBasename = md.basename;
 			g.setNode(nodeBasename);
 
-			// console.log("Creating node " + nodeBasename);
+			console.log("Creating node " + nodeBasename);
 			let text = await this.app.vault.adapter.read(md.path);
 
 			// @ts-ignore
-			const result = text.matchAll(/\[\[([a-zA-Z0-9\ \#\^\|\,\.\“\'\-\–]*)\]\]/gmi); // only clean links for now
+			const result = text.matchAll(/\[\[(.*)\]\]/gmi); // only clean links for now
 			const r = Array.from(result);
 
-			r.forEach(function(x) {
+			for(var i = 0; i < r.length; i++) {
+				let x = r[i];
+
 				// @ts-ignore
 				let target = x[1];
 
@@ -56,9 +60,20 @@ export default class MyPlugin extends Plugin {
 				if(target.indexOf("|") != -1) target = target.substring(0, target.indexOf("|"))
 				if(target.indexOf("^") != -1) target = target.substring(0, target.indexOf("^"))
 
-				// console.log("     Adding edge to " + target);
-				g.setEdge(nodeBasename, target);
-			});
+				target = target.trim();
+
+
+				if(this.settings.useForwardLinks) {
+					// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
+					g.setEdge(nodeBasename, target);
+				}
+
+				// allow backlinks
+				if(this.settings.useBackLinks) {
+					// console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
+					g.setEdge(target, nodeBasename);
+				}
+			}
 		}
 
 		// const components = graphlib.alg.components(g);
@@ -92,12 +107,25 @@ export default class MyPlugin extends Plugin {
 		this.searchModal = new SearchModal(this.app, this);
 		this.searchModal.open();
 	}
+
+	private loadSettings() {
+		this.settings = new JourneyPluginSettings();
+		(async () => {
+			const loadedSettings = await this.loadData();
+			if (loadedSettings) {
+				this.settings.useForwardLinks = loadedSettings.useForwardLinks;
+				this.settings.useBackLinks = loadedSettings.useBackLinks;
+			} else {
+				this.saveData(this.settings);
+			}
+		})();
+	}
 }
 
 class SearchModal extends Modal {
 	private plugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: JourneyPlugin) {
 		super(app);
 		this.plugin = plugin;
 	}
@@ -144,7 +172,7 @@ class ResultsModal extends Modal {
 	public startBasename: string;
 	public endBasename: string;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: JourneyPlugin) {
 		super(app);
 		this.plugin = plugin;
 	}
@@ -218,5 +246,53 @@ class ResultsModal extends Modal {
 		});
 
 		return result;
+	}
+}
+
+class JourneyPluginSettings {
+	public useForwardLinks: boolean;
+	public useBackLinks: boolean;
+
+	constructor() {
+		this.useForwardLinks = true;
+		this.useBackLinks = true;
+	}
+}
+
+class JourneyPluginSettingsTab extends PluginSettingTab {
+	private readonly plugin: JourneyPlugin;
+
+	constructor(app: App, plugin: JourneyPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const {containerEl} = this;
+
+		containerEl.empty();
+
+		containerEl.createEl("h2", {text: "Journey Plugin Settings"});
+
+		new Setting(containerEl)
+			.setName("Use Forward-links")
+			.setDesc("If set, allows to search using forward-links. If you have a graph like this: A -> B -> C and you ask about the path between A and C, it will give you 'A, B, C' since A forward-links to B and B forward-links to C")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.useForwardLinks).onChange((value) => {
+					this.plugin.settings.useForwardLinks = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
+
+		new Setting(containerEl)
+			.setName("Use Back-links")
+			.setDesc("If set, allows to search using back-links. If you have a graph like this: A -> B -> C and you ask about the path between C and A, it will give you 'C, B, A' since C has a back-link from B and B has a back-link from A")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.useBackLinks).onChange((value) => {
+					this.plugin.settings.useBackLinks = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
+
 	}
 }
