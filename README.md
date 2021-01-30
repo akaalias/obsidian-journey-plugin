@@ -2,7 +2,7 @@
 Helps you find the story between your notes.
 
 ## Announcement
-![](https://github.com/akaalias/obsidian-journey-plugin/blob/master/journey-thumbnail.png?raw=true)
+![https://www.youtube.com/watch?v=iRydNlinRlc](https://github.com/akaalias/obsidian-journey-plugin/blob/master/journey-thumbnail.png?raw=true)
 [Watch the video on YouTube!](https://www.youtube.com/watch?v=iRydNlinRlc)
 
 ## Discussion
