@@ -86,14 +86,18 @@ export default class JourneyPlugin extends Plugin {
 					tag = tag.trim();
 
 					if(!g.hasNode(tag)) {
-						console.log("Adding Tag node" + tag)
+						// console.log("Adding Tag node" + tag)
 						g.setNode(tag);
 					}
 
-					console.log("Adding edge " + nodeBasename + " -> " + tag);
-					g.setEdge(nodeBasename, tag);
-					console.log("Adding edge " + tag + " -> " + nodeBasename);
-					g.setEdge(tag, nodeBasename);
+					if(!g.hasEdge(nodeBasename, tag)) {
+						// console.log("Adding edge " + nodeBasename + " -> " + tag);
+						g.setEdge(nodeBasename, tag);
+					}
+					if(!g.hasEdge(tag, nodeBasename)) {
+						// console.log("Adding edge " + tag + " -> " + nodeBasename);
+						g.setEdge(tag, nodeBasename);
+					}
 				}
 			}
 		}
