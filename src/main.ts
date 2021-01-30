@@ -150,11 +150,19 @@ export default class JourneyPlugin extends Plugin {
 }
 
 class SearchModal extends Modal {
-	private plugin;
+	private plugin: JourneyPlugin;
+	private dropdownStart: DropdownComponent;
+	private dropdownEnd: DropdownComponent;
+	private markdownFiles: any[];
 
 	constructor(app: App, plugin: JourneyPlugin) {
 		super(app);
 		this.plugin = plugin;
+	}
+
+	findRandomNoteBasename() {
+		const rand = Math.floor(Math.random() * this.markdownFiles.length) + 1
+		return this.markdownFiles[rand].basename;
 	}
 
 	onOpen() {
@@ -163,30 +171,39 @@ class SearchModal extends Modal {
 
 		let formDiv = contentEl.createDiv({cls: 'journey-search-form'})
 
-		let markdownFiles = this.app.vault.getMarkdownFiles();
-		let dropdownStart = new DropdownComponent(formDiv);
-		dropdownStart.addOption("", "Select your Starting Note")
-		let dropdownEnd = new DropdownComponent(formDiv);
-		dropdownEnd.addOption("", "Select your Ending Note")
+		this.markdownFiles = this.app.vault.getMarkdownFiles();
+		this.dropdownStart = new DropdownComponent(formDiv);
+		this.dropdownStart.addOption("", "Select your Starting Note")
+		this.dropdownEnd = new DropdownComponent(formDiv);
+		this.dropdownEnd.addOption("", "Select your Ending Note")
 
-		markdownFiles.forEach(function(x) {
-			dropdownStart.addOption(x.basename, x.basename);
-			dropdownEnd.addOption(x.basename, x.basename);
-		});
+		for(var i = 0; i < this.markdownFiles.length; i++) {
+			let x = this.markdownFiles[i];
+			this.dropdownStart.addOption(x.basename, x.basename);
+			this.dropdownEnd.addOption(x.basename, x.basename);
+		}
 
 		formDiv.createEl("br");
 		let button = formDiv.createEl('input', {type: 'submit', cls: 'journey-input-button', value: 'Find Journey'});
 
-		var boundFunction = (function() {
+		var searchFunction = (function() {
 			contentEl.replaceWith(contentEl.createEl("h2", {text: "Searching..."}));
-			this.plugin.findShortestPath(dropdownStart.getValue(), dropdownEnd.getValue());
+			this.plugin.findShortestPath(this.dropdownStart.getValue(), this.dropdownEnd.getValue());
 		}).bind(this);
 
-		button.onclick = boundFunction;
+		button.onclick = searchFunction;
+
+		let lucky = formDiv.createEl('p', {cls: 'journey-search-lucky', text: 'I am feeling lucky'});
+		var luckyFunction = (function() {
+			this.dropdownStart.setValue(this.findRandomNoteBasename());
+			this.dropdownEnd.setValue(this.findRandomNoteBasename());
+		}).bind(this);
+
+		lucky.onclick = luckyFunction;
 
 		// add showing which settings are on
 		formDiv.createEl("br");
-		let s:string = "Discovery via ";
+		let s:string = "Discovery via: ";
 		if(this.plugin.settings.useForwardLinks) {
 			s += "✔ Forwardlinks ";
 		}
@@ -237,12 +254,12 @@ class ResultsModal extends Modal {
 			noSearchResult.appendChild(createEl("p", {text: "Here are some possible reasons why:" }));
 			let explanationList = createEl('ul');
 
-			if(!this.plugin.settings.useBackLinks) {
-				explanationList.createEl('li', {text: 'You currently have backlinks disabled in your settings.'});
+			if(!this.plugin.settings.useForwardLinks) {
+				explanationList.createEl('li', {text: 'You currently have forward-links disabled in your settings.'});
 			}
 
 			if(!this.plugin.settings.useBackLinks) {
-				explanationList.createEl('li', {text: 'You currently have forward-links disabled in your settings.'});
+				explanationList.createEl('li', {text: 'You currently have back-links disabled in your settings.'});
 			}
 
 			if(!this.plugin.settings.useTags) {
