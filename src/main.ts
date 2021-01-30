@@ -51,28 +51,35 @@ export default class JourneyPlugin extends Plugin {
 
 			const r = Array.from(result);
 
-			for(var i = 0; i < r.length; i++) {
-				let x = r[i];
+			// console.log(this.settings.MOCMaxLinks);
 
-				// @ts-ignore
-				let target = x[1];
+			if(!this.settings.skipMOCs || !(r.length > this.settings.MOCMaxLinks)) {
 
-				if(target.indexOf("#") != -1) target = target.substring(0, target.indexOf("#"))
-				if(target.indexOf("|") != -1) target = target.substring(0, target.indexOf("|"))
-				if(target.indexOf("^") != -1) target = target.substring(0, target.indexOf("^"))
+				for(var i = 0; i < r.length; i++) {
+					let x = r[i];
 
-				target = target.trim();
+					// @ts-ignore
+					let target = x[1];
 
-				if(this.settings.useForwardLinks) {
-					// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
-					g.setEdge(nodeBasename, target);
+					if(target.indexOf("#") != -1) target = target.substring(0, target.indexOf("#"))
+					if(target.indexOf("|") != -1) target = target.substring(0, target.indexOf("|"))
+					if(target.indexOf("^") != -1) target = target.substring(0, target.indexOf("^"))
+
+					target = target.trim();
+
+					if(this.settings.useForwardLinks) {
+						// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
+						g.setEdge(nodeBasename, target);
+					}
+
+					// allow backlinks
+					if(this.settings.useBackLinks) {
+						// console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
+						g.setEdge(target, nodeBasename);
+					}
 				}
-
-				// allow backlinks
-				if(this.settings.useBackLinks) {
-					// console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
-					g.setEdge(target, nodeBasename);
-				}
+			} else {
+				console.log("Skipping edge creation for " + nodeBasename + " with too many (" + r.length + "/" + this.settings.MOCMaxLinks + ") links");
 			}
 
 			if(this.settings.useTags) {
@@ -142,6 +149,8 @@ export default class JourneyPlugin extends Plugin {
 				this.settings.useForwardLinks = loadedSettings.useForwardLinks;
 				this.settings.useBackLinks = loadedSettings.useBackLinks;
 				this.settings.useTags = loadedSettings.useTags;
+				this.settings.skipMOCs = loadedSettings.skipMOCs;
+				this.settings.MOCMaxLinks = loadedSettings.MOCMaxLinks;
 			} else {
 				this.saveData(this.settings);
 			}
@@ -193,7 +202,7 @@ class SearchModal extends Modal {
 
 		button.onclick = searchFunction;
 
-		let lucky = formDiv.createEl('p', {cls: 'journey-search-lucky', text: 'I am feeling lucky'});
+		let lucky = formDiv.createEl('p', {cls: 'journey-search-lucky', text: 'I feel lucky'});
 		var luckyFunction = (function() {
 			this.dropdownStart.setValue(this.findRandomNoteBasename());
 			this.dropdownEnd.setValue(this.findRandomNoteBasename());
@@ -203,7 +212,7 @@ class SearchModal extends Modal {
 
 		// add showing which settings are on
 		formDiv.createEl("br");
-		let s:string = "Discovery via: ";
+		let s:string = "Travel via: ";
 		if(this.plugin.settings.useForwardLinks) {
 			s += "✔ Forwardlinks ";
 		}
@@ -212,6 +221,9 @@ class SearchModal extends Modal {
 		}
 		if(this.plugin.settings.useTags) {
 			s += "✔ Tags ";
+		}
+		if(this.plugin.settings.skipMOCs) {
+			s += "✔ Skip MOCs with " + this.plugin.settings.MOCMaxLinks + " or more links"
 		}
 
 		formDiv.createEl("p", {text: s, cls: 'discovery-settings' });
@@ -255,15 +267,19 @@ class ResultsModal extends Modal {
 			let explanationList = createEl('ul');
 
 			if(!this.plugin.settings.useForwardLinks) {
-				explanationList.createEl('li', {text: 'You currently have forward-links disabled in your settings.'});
+				explanationList.createEl('li', {text: 'You currently have forward-links disabled in your settings'});
 			}
 
 			if(!this.plugin.settings.useBackLinks) {
-				explanationList.createEl('li', {text: 'You currently have back-links disabled in your settings.'});
+				explanationList.createEl('li', {text: 'You currently have back-links disabled in your settings'});
 			}
 
 			if(!this.plugin.settings.useTags) {
-				explanationList.createEl('li', {text: 'You currently have tags disabled in your settings.'});
+				explanationList.createEl('li', {text: 'You currently have tags disabled in your settings'});
+			}
+
+			if(this.plugin.settings.skipMOCs) {
+				explanationList.createEl('li', {text: 'You currently have skipping MOCs with more than ' + this.plugin.settings.MOCMaxLinks + ' outbound links enabled'});
 			}
 
 			explanationList.createEl('li', {text: 'The two notes may not be in the same network.'});
@@ -330,16 +346,21 @@ class JourneyPluginSettings {
 	public useForwardLinks: boolean;
 	public useBackLinks: boolean;
 	public useTags: boolean;
+	public skipMOCs: boolean;
+	public MOCMaxLinks: number;
 
 	constructor() {
 		this.useForwardLinks = true;
 		this.useBackLinks = true;
 		this.useTags = true;
+		this.skipMOCs = false;
+		this.MOCMaxLinks = 30;
 	}
 }
 
 class JourneyPluginSettingsTab extends PluginSettingTab {
 	private readonly plugin: JourneyPlugin;
+	public MOCMaxLinksCounter: HTMLDivElement;
 
 	constructor(app: App, plugin: JourneyPlugin) {
 		super(app, plugin);
@@ -355,7 +376,7 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Use Forward-links")
-			.setDesc("If set, allows to search using forward-links. If you have a graph like this: A -> B -> C and you ask about the story between A and C, it will give you 'A, B, C' since A forward-links to B and B forward-links to C")
+			.setDesc("If set, allows to travel using forward-links. If you have a graph like this: A -> B -> C and you ask about the story between A and C, it will give you 'A, B, C' since A forward-links to B and B forward-links to C")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.useForwardLinks).onChange((value) => {
 					this.plugin.settings.useForwardLinks = value;
@@ -365,7 +386,7 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Use Back-links")
-			.setDesc("If set, allows to search using back-links. If you have a graph like this: A -> B -> C and you ask about the story between C and A, it will give you 'C, B, A' since C has a back-link from B and B has a back-link from A")
+			.setDesc("If set, allows to travel using back-links. If you have a graph like this: A -> B -> C and you ask about the story between C and A, it will give you 'C, B, A' since C has a back-link from B and B has a back-link from A")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.useBackLinks).onChange((value) => {
 					this.plugin.settings.useBackLinks = value;
@@ -373,14 +394,40 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 				}),
 			);
 
+		containerEl.createEl("h3", {text: "Include Tags"});
+
 		new Setting(containerEl)
 			.setName("Use Tags")
-			.setDesc("If set, allows to search using tags. ")
+			.setDesc("If set, allows to travel using tags. ")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.useTags).onChange((value) => {
 					this.plugin.settings.useTags = value;
 					this.plugin.saveData(this.plugin.settings);
 				}),
 			);
+
+		containerEl.createEl("h3", {text: "Avoid traveling via certain notes"});
+
+		new Setting(containerEl)
+			.setName("Take the scenic route")
+			.setDesc("If set, will skip 'hub' notes with too many links (MOCs). Configure exactly how many links make a MOC below.")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.skipMOCs).onChange((value) => {
+					this.plugin.settings.skipMOCs = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
+
+		new Setting(containerEl)
+			.setName("How many links make a MOC?")
+			.setDesc("Configure at which point to skip a note because it contains too many out-bound links. Applies only if 'Take the scenic route' above is set.")
+			.addSlider((toggle) =>
+				toggle.setValue(this.plugin.settings.MOCMaxLinks).onChange((value) => {
+					this.MOCMaxLinksCounter.setText("Max link count: " + String(value));
+					this.plugin.settings.MOCMaxLinks = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
+		this.MOCMaxLinksCounter = containerEl.createDiv({cls: 'moc-max-links-counter', text: "Max link count: " + this.plugin.settings.MOCMaxLinks});
 	}
 }
