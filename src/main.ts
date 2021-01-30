@@ -48,6 +48,7 @@ export default class JourneyPlugin extends Plugin {
 
 			// @ts-ignore
 			const result = text.matchAll(/\[\[(.*)\]\]/gmi); // only clean links for now
+
 			const r = Array.from(result);
 
 			for(var i = 0; i < r.length; i++) {
@@ -71,6 +72,28 @@ export default class JourneyPlugin extends Plugin {
 				if(this.settings.useBackLinks) {
 					// console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
 					g.setEdge(target, nodeBasename);
+				}
+			}
+
+			if(this.settings.useTags) {
+				// @ts-ignore
+				const result = text.matchAll(/\#\w+/gmi);
+				const ts = Array.from(result);
+
+				for(var i = 0; i < ts.length; i++) {
+					let tag = String(ts[i]);
+					// @ts-ignore
+					tag = tag.trim();
+
+					if(!g.hasNode(tag)) {
+						console.log("Adding Tag node" + tag)
+						g.setNode(tag);
+					}
+
+					console.log("Adding edge " + nodeBasename + " -> " + tag);
+					g.setEdge(nodeBasename, tag);
+					console.log("Adding edge " + tag + " -> " + nodeBasename);
+					g.setEdge(tag, nodeBasename);
 				}
 			}
 		}
@@ -114,6 +137,7 @@ export default class JourneyPlugin extends Plugin {
 			if (loadedSettings) {
 				this.settings.useForwardLinks = loadedSettings.useForwardLinks;
 				this.settings.useBackLinks = loadedSettings.useBackLinks;
+				this.settings.useTags = loadedSettings.useTags;
 			} else {
 				this.saveData(this.settings);
 			}
@@ -156,6 +180,20 @@ class SearchModal extends Modal {
 
 		button.onclick = boundFunction;
 
+		// add showing which settings are on
+		formDiv.createEl("br");
+		let s:string = "Discovery via ";
+		if(this.plugin.settings.useForwardLinks) {
+			s += "Forwardlinks ";
+		}
+		if(this.plugin.settings.useBackLinks) {
+			s += "Backlinks ";
+		}
+		if(this.plugin.settings.useTags) {
+			s += "Tags ";
+		}
+
+		formDiv.createEl("p", {text: s, cls: 'discovery-settings' });
 	}
 
 	onClose() {
@@ -203,6 +241,10 @@ class ResultsModal extends Modal {
 				explanationList.createEl('li', {text: 'You currently have forward-links disabled in your settings.'});
 			}
 
+			if(!this.plugin.settings.useTags) {
+				explanationList.createEl('li', {text: 'You currently have tags disabled in your settings.'});
+			}
+
 			explanationList.createEl('li', {text: 'The two notes may not be in the same network.'});
 
 			noSearchResult.appendChild(explanationList);
@@ -214,10 +256,11 @@ class ResultsModal extends Modal {
 			let reversedResults = this.results.reverse();
 			for(var i = 0; i < reversedResults.length; i++) {
 				let text = reversedResults[i];
-				let cls = "journey-result-list-item";
+				let cls = "journey-result-list-item-note";
 
 				if(i == 0) cls = "journey-result-list-item-start";
 				if(i == reversedResults.length - 1) cls = "journey-result-list-item-end";
+				if(text.match(/^\#\w+/)) cls = "journey-result-list-item-tag"
 
 				list.appendChild(createDiv({text: text, cls: cls}))
 			}
@@ -265,10 +308,12 @@ class ResultsModal extends Modal {
 class JourneyPluginSettings {
 	public useForwardLinks: boolean;
 	public useBackLinks: boolean;
+	public useTags: boolean;
 
 	constructor() {
 		this.useForwardLinks = true;
 		this.useBackLinks = true;
+		this.useTags = true;
 	}
 }
 
@@ -307,5 +352,14 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 				}),
 			);
 
+		new Setting(containerEl)
+			.setName("Use Tags")
+			.setDesc("If set, allows to search using tags. ")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.useTags).onChange((value) => {
+					this.plugin.settings.useTags = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
 	}
 }

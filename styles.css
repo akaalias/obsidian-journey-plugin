@@ -30,13 +30,16 @@
     color: white;
 }
 
-.journey-result-list-item, .journey-result-list-item-start, .journey-result-list-item-end {
+.journey-result-list-item-note, .journey-result-list-item-start, .journey-result-list-item-end, .journey-result-list-item-tag {
     font-size: 24px;
     padding: 10px;
     margin-bottom: 10px;
     background-color: #555;
     border: 5px solid #777;
     border-radius: 10px 10px 10px 10px;
+}
+
+.journey-result-list-item-note {
 }
 
 .journey-result-list-item-start {
@@ -49,7 +52,17 @@
     border: 3px solid forestgreen;
 }
 
+.journey-result-list-item-tag {
+    background-color: darkblue;
+    border: 3px solid royalblue;
+}
+
 .journey-result-list-reset-link {
-    color: #ccc;
+    text-align: center;
+    text-decoration: underline;
+}
+
+.discovery-settings {
+    font-size: 12px;
     text-align: center;
 }
