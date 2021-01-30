@@ -184,13 +184,13 @@ class SearchModal extends Modal {
 		formDiv.createEl("br");
 		let s:string = "Discovery via ";
 		if(this.plugin.settings.useForwardLinks) {
-			s += "Forwardlinks ";
+			s += "✔ Forwardlinks ";
 		}
 		if(this.plugin.settings.useBackLinks) {
-			s += "Backlinks ";
+			s += "✔ Backlinks ";
 		}
 		if(this.plugin.settings.useTags) {
-			s += "Tags ";
+			s += "✔ Tags ";
 		}
 
 		formDiv.createEl("p", {text: s, cls: 'discovery-settings' });
@@ -334,7 +334,7 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Use Forward-links")
-			.setDesc("If set, allows to search using forward-links. If you have a graph like this: A -> B -> C and you ask about the path between A and C, it will give you 'A, B, C' since A forward-links to B and B forward-links to C")
+			.setDesc("If set, allows to search using forward-links. If you have a graph like this: A -> B -> C and you ask about the story between A and C, it will give you 'A, B, C' since A forward-links to B and B forward-links to C")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.useForwardLinks).onChange((value) => {
 					this.plugin.settings.useForwardLinks = value;
@@ -344,7 +344,7 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Use Back-links")
-			.setDesc("If set, allows to search using back-links. If you have a graph like this: A -> B -> C and you ask about the path between C and A, it will give you 'C, B, A' since C has a back-link from B and B has a back-link from A")
+			.setDesc("If set, allows to search using back-links. If you have a graph like this: A -> B -> C and you ask about the story between C and A, it will give you 'C, B, A' since C has a back-link from B and B has a back-link from A")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.useBackLinks).onChange((value) => {
 					this.plugin.settings.useBackLinks = value;

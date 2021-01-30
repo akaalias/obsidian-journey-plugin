@@ -1,19 +1,11 @@
 ## Journey Plugin for Obsidian
 Helps you find the story between your notes.
 
-## Demo
-### After installation
+## Announcement
+[Watch the video on YouTube!](https://www.youtube.com/watch?v=iRydNlinRlc)
 
-## Known Issues
-
-## Learning
-### Announcement Video
-
-## Backlog
-
-### Todo
-
-### Doing
+## Discussion
+[Share your thoughs in this thread](https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153)
 
 ### Done
 - [x] Allow for tags to be links
