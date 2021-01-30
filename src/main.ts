@@ -43,7 +43,7 @@ export default class JourneyPlugin extends Plugin {
 			const nodeBasename = md.basename;
 			g.setNode(nodeBasename);
 
-			console.log("Creating node " + nodeBasename);
+			// console.log("Creating node " + nodeBasename);
 			let text = await this.app.vault.adapter.read(md.path);
 
 			// @ts-ignore
@@ -61,7 +61,6 @@ export default class JourneyPlugin extends Plugin {
 				if(target.indexOf("^") != -1) target = target.substring(0, target.indexOf("^"))
 
 				target = target.trim();
-
 
 				if(this.settings.useForwardLinks) {
 					// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
@@ -132,7 +131,7 @@ class SearchModal extends Modal {
 
 	onOpen() {
 		let {contentEl} = this;
-		contentEl.createEl("h2", {text: "Find Path Between Two Notes"});
+		contentEl.createEl("h2", {text: "Find the Story Between Two Notes"});
 
 		let formDiv = contentEl.createDiv({cls: 'journey-search-form'})
 
@@ -192,7 +191,21 @@ class ResultsModal extends Modal {
 
 		if(this.results.length <= 0) {
 			let noSearchResult = createDiv();
-			noSearchResult.appendChild(createEl("h2", {text: "No Path Found between " + this.startBasename + " and " + this.endBasename}));
+			noSearchResult.appendChild(createEl("h2", {text: "No Journey Found between " + this.startBasename + " and " + this.endBasename}));
+			noSearchResult.appendChild(createEl("p", {text: "Here are some possible reasons why:" }));
+			let explanationList = createEl('ul');
+
+			if(!this.plugin.settings.useBackLinks) {
+				explanationList.createEl('li', {text: 'You currently have backlinks disabled in your settings.'});
+			}
+
+			if(!this.plugin.settings.useBackLinks) {
+				explanationList.createEl('li', {text: 'You currently have forward-links disabled in your settings.'});
+			}
+
+			explanationList.createEl('li', {text: 'The two notes may not be in the same network.'});
+
+			noSearchResult.appendChild(explanationList);
 			noSearchResult.appendChild(anotherSearch);
 			contentEl.replaceWith(noSearchResult);
 		} else {
