@@ -1,7 +1,7 @@
 {
   "name": "obsidian-journey-plugin",
-  "version": "0.0.1",
-  "description": "Journey Plugin",
+  "version": "0.0.3",
+  "description": "Journey",
   "main": "main.js",
   "scripts": {
     "dev": "rollup --config rollup.config.js -w",
