@@ -1,11 +1,33 @@
 ## Obsidian Journey Plugin
-Discover the story between your notes.
+### Discover the story between your notes!
+
+Hey there, Alexis here! 
+
+I’ve put together this new plugin and I would like to share with you. 
+
+Basically it helps me find the stories between my notes and bootstrap the outline for a new text much faster.
+
+Overall, I’ve noticed that my actual creative output hasn’t been as prolific as I would like it to be. I’ve created hundreds of atomic notes, connected them etc. 
+
+And yet I felt really stuck and didn’t know how to extract a linear story from my ‘hairball’ vault.
+
+To me, the upfront work of creating that outline is still really hard. 
+
+Plus: I KNOW it’s in there (my vault)! I just want to get to a first draft faster. 
+
+I want to spend my energy writing and editing the story. 
+
+So that’s what this is about. Find the connection between two notes in my vault to discover new ideas and help write that first draft.
+
+Here’s a quick video with a demo if you’re interested:
+
+Cheers and let me know what you think!
 
 [![](https://github.com/akaalias/obsidian-journey-plugin/blob/master/journey-thumbnail.png?raw=true)](https://www.youtube.com/watch?v=iRydNlinRlc)
 
 ### What features are included:
 
-Based on the community feedback and comments, I realized that there are many different ways to go on that journey and so I've created a bunch of features you can toggle on or of to your liking. 
+Based on the [amazing community feedback and comments](https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153), I realized that there are many different ways to go on that journey and so I've created a bunch of features you can toggle on or of to your liking. 
 
 These features are like preferences you can give your navigation-system in your car. Maybe today, all you care about is getting from A to B quickly. Maybe tomorrow, you have more time to "take the scenic route." I want you to be as flexible as possible.
 
