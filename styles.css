@@ -30,7 +30,10 @@
     color: white;
 }
 
-.journey-result-list-item-note, .journey-result-list-item-start, .journey-result-list-item-end, .journey-result-list-item-tag {
+.journey-result-list .journey-result-list-item-note,
+.journey-result-list .journey-result-list-item-start,
+.journey-result-list .journey-result-list-item-end,
+.journey-result-list .journey-result-list-item-tag {
     font-size: 24px;
     padding: 10px;
     margin-bottom: 10px;
@@ -39,23 +42,34 @@
     border-radius: 10px 10px 10px 10px;
 }
 
-.journey-result-list-item-note {
-}
-
-.journey-result-list-item-start {
+.journey-result-list .journey-result-list-item-start {
     background-color: darkgreen;
     border: 3px solid forestgreen;
 }
 
-.journey-result-list-item-end {
+.journey-result-list .journey-result-list-item-end {
     background-color: darkgreen;
     border: 3px solid forestgreen;
 }
 
-.journey-result-list-item-tag {
+.journey-result-list .journey-result-list-item-tag {
     background-color: darkblue;
     border: 3px solid royalblue;
 }
+
+.journey-result-list-high-contrast .journey-result-list-item-note,
+.journey-result-list-high-contrast .journey-result-list-item-start,
+.journey-result-list-high-contrast .journey-result-list-item-end,
+.journey-result-list-high-contrast .journey-result-list-item-tag {
+    font-size: 24px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #000;
+    color: white;
+    border: 5px solid #333;
+    border-radius: 10px 10px 10px 10px;
+}
+
 
 .journey-result-list-reset-link {
     text-align: center;
@@ -63,7 +77,7 @@
 }
 
 .discovery-settings {
-    font-size: 12px;
+    font-size: 9px;
     text-align: center;
 }
 

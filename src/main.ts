@@ -1,6 +1,7 @@
 import {addIcon, App, DropdownComponent, Modal, Notice, Plugin, PluginSettingTab, Setting} from 'obsidian';
 import { Graph } from 'graphlib';
 import * as graphlib from "graphlib";
+import {kMaxLength} from "buffer";
 
 addIcon('journey', '<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">\n' +
 	'<rect width="100" height="100" fill="white"/>\n' +
@@ -151,6 +152,7 @@ export default class JourneyPlugin extends Plugin {
 				this.settings.useTags = loadedSettings.useTags;
 				this.settings.skipMOCs = loadedSettings.skipMOCs;
 				this.settings.MOCMaxLinks = loadedSettings.MOCMaxLinks;
+				this.settings.enableHighContrast = loadedSettings.enableHighContrast;
 			} else {
 				this.saveData(this.settings);
 			}
@@ -212,21 +214,28 @@ class SearchModal extends Modal {
 
 		// add showing which settings are on
 		formDiv.createEl("br");
-		let s:string = "Travel via: ";
+		let via:string = "";
 		if(this.plugin.settings.useForwardLinks) {
-			s += "✔ Forwardlinks ";
+			via += "✔ Forwardlinks ";
 		}
 		if(this.plugin.settings.useBackLinks) {
-			s += "✔ Backlinks ";
+			via += "✔ Backlinks ";
 		}
 		if(this.plugin.settings.useTags) {
-			s += "✔ Tags ";
-		}
-		if(this.plugin.settings.skipMOCs) {
-			s += "✔ Skip MOCs with " + this.plugin.settings.MOCMaxLinks + " or more links"
+			via += "✔ Tags";
 		}
 
-		formDiv.createEl("p", {text: s, cls: 'discovery-settings' });
+		let avoid = "";
+		if(this.plugin.settings.skipMOCs) {
+			avoid = "✔ MOCs with " + this.plugin.settings.MOCMaxLinks + " or more links "
+		}
+
+		let visual = "";
+		if(this.plugin.settings.enableHighContrast) {
+			visual = "✔ High-Contrast ";
+		}
+
+		formDiv.createEl("p", {text: via + " " + avoid + " " + visual, cls: 'discovery-settings' });
 	}
 
 	onClose() {
@@ -288,7 +297,12 @@ class ResultsModal extends Modal {
 			noSearchResult.appendChild(anotherSearch);
 			contentEl.replaceWith(noSearchResult);
 		} else {
-			let list = createDiv({cls: 'journey-result-list'});
+			let listClass = 'journey-result-list';
+			if(this.plugin.settings.enableHighContrast) {
+				listClass = 'journey-result-list-high-contrast';
+			}
+
+			let list = createDiv({cls: listClass});
 
 			let reversedResults = this.results.reverse();
 			for(var i = 0; i < reversedResults.length; i++) {
@@ -348,6 +362,7 @@ class JourneyPluginSettings {
 	public useTags: boolean;
 	public skipMOCs: boolean;
 	public MOCMaxLinks: number;
+	public enableHighContrast: boolean;
 
 	constructor() {
 		this.useForwardLinks = true;
@@ -355,6 +370,7 @@ class JourneyPluginSettings {
 		this.useTags = true;
 		this.skipMOCs = false;
 		this.MOCMaxLinks = 30;
+		this.enableHighContrast = false;
 	}
 }
 
@@ -429,5 +445,19 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 				}),
 			);
 		this.MOCMaxLinksCounter = containerEl.createDiv({cls: 'moc-max-links-counter', text: "Max link count: " + this.plugin.settings.MOCMaxLinks});
+
+		containerEl.createEl("h3", {text: "Visual Settings"});
+
+		new Setting(containerEl)
+			.setName("Enable High Contrast")
+			.setDesc("If set, will increase the contrast to make the result-list easier to read.")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.enableHighContrast).onChange((value) => {
+					this.plugin.settings.enableHighContrast = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
+
+
 	}
 }
