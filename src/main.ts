@@ -172,8 +172,6 @@ export default class JourneyPlugin extends Plugin {
 
 class SearchModal extends Modal {
 	private plugin: JourneyPlugin;
-	private dropdownStart: DropdownComponent;
-	private dropdownEnd: DropdownComponent;
 	private markdownFiles: any[];
 	private searchStart: TextComponent;
 	private searchEnd: TextComponent;
@@ -251,15 +249,15 @@ class SearchModal extends Modal {
 
 		var searchFunction = (function() {
 			contentEl.replaceWith(contentEl.createEl("h2", {text: "Searching..."}));
-			this.plugin.findShortestPath(this.searchStart.getValue(), this.dropdownEnd.getValue());
+			this.plugin.findShortestPath(this.searchStart.getValue(), this.searchEnd.getValue());
 		}).bind(this);
 
 		button.onclick = searchFunction;
 
 		let lucky = formDiv.createEl('p', {cls: 'journey-search-lucky', text: 'I feel lucky'});
 		var luckyFunction = (function() {
-			this.dropdownStart.setValue(this.findRandomNoteBasename());
-			this.dropdownEnd.setValue(this.findRandomNoteBasename());
+			this.searchStart.setValue(this.findRandomNoteBasename());
+			this.searchEnd.setValue(this.findRandomNoteBasename());
 		}).bind(this);
 
 		lucky.onclick = luckyFunction;
