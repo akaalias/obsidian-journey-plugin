@@ -1,4 +1,14 @@
-import {addIcon, App, DropdownComponent, Modal, Notice, Plugin, PluginSettingTab, Setting} from 'obsidian';
+import {
+	addIcon,
+	App,
+	DropdownComponent,
+	Modal,
+	Notice,
+	Plugin,
+	PluginSettingTab,
+	SearchComponent,
+	Setting, TextComponent
+} from 'obsidian';
 import { Graph } from 'graphlib';
 import * as graphlib from "graphlib";
 import {kMaxLength} from "buffer";
@@ -165,6 +175,8 @@ class SearchModal extends Modal {
 	private dropdownStart: DropdownComponent;
 	private dropdownEnd: DropdownComponent;
 	private markdownFiles: any[];
+	private searchStart: TextComponent;
+	private searchEnd: TextComponent;
 
 	constructor(app: App, plugin: JourneyPlugin) {
 		super(app);
@@ -176,6 +188,49 @@ class SearchModal extends Modal {
 		return this.markdownFiles[rand].basename;
 	}
 
+	autocomplete(value: string, autocompleteResult: HTMLDivElement, targetElement: TextComponent) {
+
+		autocompleteResult.innerHTML = "";
+
+		let autocompleteResultContent = createDiv({cls: 'journey-search-autocomplete-results-content'});
+		autocompleteResult.appendChild(autocompleteResultContent);
+
+		console.log("Searching for:" + value);
+		if(!(value.length > 3)) {
+			autocompleteResult.addClass("hide-me");
+			return;
+		}
+
+		let searchResults = [];
+
+		for(var i = 0; i < this.markdownFiles.length; i++) {
+			if(this.markdownFiles[i].basename.toUpperCase().includes(value.toUpperCase())) {
+				// console.log("Found: " + this.markdownFiles[i].basename);
+				searchResults.push(this.markdownFiles[i].basename);
+			}
+		}
+
+		var limit = searchResults.length;
+		if(limit > 5) {limit = 5};
+		autocompleteResultContent.innerHTML = "";
+
+		for(var i = 0; i < limit; i++) {
+			let li = createDiv({text: searchResults[i], cls: 'journey-search-autocomplete-results-content-item'});
+
+			li.addEventListener("click", function() {
+				let text = li.getText();
+				targetElement.setValue(text);
+				autocompleteResult.removeClass("show-me");
+				autocompleteResult.addClass("hide-me");
+			}.bind(this));
+
+			autocompleteResultContent.appendChild(li);
+		}
+
+		autocompleteResult.removeClass("hide-me");
+		autocompleteResult.addClass("show-me");
+	};
+
 	onOpen() {
 		let {contentEl} = this;
 		contentEl.createEl("h2", {text: "Find the Story Between Two Notes"});
@@ -183,23 +238,20 @@ class SearchModal extends Modal {
 		let formDiv = contentEl.createDiv({cls: 'journey-search-form'})
 
 		this.markdownFiles = this.app.vault.getMarkdownFiles();
-		this.dropdownStart = new DropdownComponent(formDiv);
-		this.dropdownStart.addOption("", "Select your Starting Note")
-		this.dropdownEnd = new DropdownComponent(formDiv);
-		this.dropdownEnd.addOption("", "Select your Ending Note")
 
-		for(var i = 0; i < this.markdownFiles.length; i++) {
-			let x = this.markdownFiles[i];
-			this.dropdownStart.addOption(x.basename, x.basename);
-			this.dropdownEnd.addOption(x.basename, x.basename);
-		}
+		this.searchStart = new TextComponent(formDiv);
+		let autocompleteResultStart = formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
+		this.searchStart.onChange(value => { this.autocomplete(value, autocompleteResultStart, this.searchStart); });
 
-		formDiv.createEl("br");
+		this.searchEnd = new TextComponent(formDiv);
+		let autocompleteResultEnd = formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
+		this.searchEnd.onChange(value => { this.autocomplete(value, autocompleteResultEnd, this.searchEnd); });
+
 		let button = formDiv.createEl('input', {type: 'submit', cls: 'journey-input-button', value: 'Find Journey'});
 
 		var searchFunction = (function() {
 			contentEl.replaceWith(contentEl.createEl("h2", {text: "Searching..."}));
-			this.plugin.findShortestPath(this.dropdownStart.getValue(), this.dropdownEnd.getValue());
+			this.plugin.findShortestPath(this.searchStart.getValue(), this.dropdownEnd.getValue());
 		}).bind(this);
 
 		button.onclick = searchFunction;
@@ -461,3 +513,5 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 
 	}
 }
+
+new Notice("Journey Re-Loaded!");
