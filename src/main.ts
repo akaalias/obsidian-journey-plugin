@@ -175,18 +175,104 @@ class SearchModal extends Modal {
 	private markdownFiles: any[];
 	private searchStart: TextComponent;
 	private searchEnd: TextComponent;
+	private formDiv: HTMLDivElement;
 
 	constructor(app: App, plugin: JourneyPlugin) {
 		super(app);
 		this.plugin = plugin;
 	}
 
-	findRandomNoteBasename() {
+	onOpen() {
+		let {contentEl} = this;
+		contentEl.createEl("h2", {text: "Find the Story Between Two Notes"});
+		this.formDiv = contentEl.createDiv({cls: 'journey-search-form'})
+
+		this.setupFileList();
+		this.addStartSearchComponent();
+		this.addEndSearchComponent();
+		this.addSearchButton(contentEl);
+		this.addLuckyButton();
+		this.addSearchSettingsDisplay();
+	}
+
+	private findRandomNoteBasename() {
 		const rand = Math.floor(Math.random() * this.markdownFiles.length) + 1
 		return this.markdownFiles[rand].basename;
 	}
 
-	autocomplete(value: string, autocompleteResult: HTMLDivElement, targetElement: TextComponent) {
+	private setupFileList() {
+		this.markdownFiles = this.app.vault.getMarkdownFiles();
+	}
+
+	private addSearchSettingsDisplay() {
+		// add showing which settings are on
+		this.formDiv.createEl("br");
+		let via: string = "";
+		if (this.plugin.settings.useForwardLinks) {
+			via += "✔ Forwardlinks ";
+		}
+		if (this.plugin.settings.useBackLinks) {
+			via += "✔ Backlinks ";
+		}
+		if (this.plugin.settings.useTags) {
+			via += "✔ Tags";
+		}
+
+		let avoid = "";
+		if (this.plugin.settings.skipMOCs) {
+			avoid = "✔ MOCs with " + this.plugin.settings.MOCMaxLinks + " or more links "
+		}
+
+		let visual = "";
+		if (this.plugin.settings.enableHighContrast) {
+			visual = "✔ High-Contrast ";
+		}
+
+		this.formDiv.createEl("p", {text: via + " " + avoid + " " + visual, cls: 'discovery-settings'});
+	}
+
+	private addLuckyButton() {
+		let lucky = this.formDiv.createEl('p', {cls: 'journey-search-lucky', text: 'I feel lucky'});
+		var luckyFunction = (function () {
+			this.searchStart.setValue(this.findRandomNoteBasename());
+			this.searchEnd.setValue(this.findRandomNoteBasename());
+		}).bind(this);
+
+		lucky.onclick = luckyFunction;
+	}
+
+	private addSearchButton(contentEl: HTMLElement) {
+		let button = this.formDiv.createEl('input', {
+			type: 'submit',
+			cls: 'journey-input-button',
+			value: 'Find Journey'
+		});
+
+		var searchFunction = (function () {
+			contentEl.replaceWith(contentEl.createEl("h2", {text: "Searching..."}));
+			this.plugin.findShortestPath(this.searchStart.getValue(), this.searchEnd.getValue());
+		}).bind(this);
+
+		button.onclick = searchFunction;
+	}
+
+	private addEndSearchComponent() {
+		this.searchEnd = new TextComponent(this.formDiv);
+		let autocompleteResultEnd = this.formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
+		this.searchEnd.onChange(value => {
+			this.autocomplete(value, autocompleteResultEnd, this.searchEnd);
+		});
+	}
+
+	private addStartSearchComponent() {
+		this.searchStart = new TextComponent(this.formDiv);
+		let autocompleteResultStart = this.formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
+		this.searchStart.onChange(value => {
+			this.autocomplete(value, autocompleteResultStart, this.searchStart);
+		});
+	}
+
+	private autocomplete(value: string, autocompleteResult: HTMLDivElement, targetElement: TextComponent) {
 
 		autocompleteResult.innerHTML = "";
 
@@ -227,65 +313,6 @@ class SearchModal extends Modal {
 
 		autocompleteResult.removeClass("hide-me");
 		autocompleteResult.addClass("show-me");
-	};
-
-	onOpen() {
-		let {contentEl} = this;
-		contentEl.createEl("h2", {text: "Find the Story Between Two Notes"});
-
-		let formDiv = contentEl.createDiv({cls: 'journey-search-form'})
-
-		this.markdownFiles = this.app.vault.getMarkdownFiles();
-
-		this.searchStart = new TextComponent(formDiv);
-		let autocompleteResultStart = formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
-		this.searchStart.onChange(value => { this.autocomplete(value, autocompleteResultStart, this.searchStart); });
-
-		this.searchEnd = new TextComponent(formDiv);
-		let autocompleteResultEnd = formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
-		this.searchEnd.onChange(value => { this.autocomplete(value, autocompleteResultEnd, this.searchEnd); });
-
-		let button = formDiv.createEl('input', {type: 'submit', cls: 'journey-input-button', value: 'Find Journey'});
-
-		var searchFunction = (function() {
-			contentEl.replaceWith(contentEl.createEl("h2", {text: "Searching..."}));
-			this.plugin.findShortestPath(this.searchStart.getValue(), this.searchEnd.getValue());
-		}).bind(this);
-
-		button.onclick = searchFunction;
-
-		let lucky = formDiv.createEl('p', {cls: 'journey-search-lucky', text: 'I feel lucky'});
-		var luckyFunction = (function() {
-			this.searchStart.setValue(this.findRandomNoteBasename());
-			this.searchEnd.setValue(this.findRandomNoteBasename());
-		}).bind(this);
-
-		lucky.onclick = luckyFunction;
-
-		// add showing which settings are on
-		formDiv.createEl("br");
-		let via:string = "";
-		if(this.plugin.settings.useForwardLinks) {
-			via += "✔ Forwardlinks ";
-		}
-		if(this.plugin.settings.useBackLinks) {
-			via += "✔ Backlinks ";
-		}
-		if(this.plugin.settings.useTags) {
-			via += "✔ Tags";
-		}
-
-		let avoid = "";
-		if(this.plugin.settings.skipMOCs) {
-			avoid = "✔ MOCs with " + this.plugin.settings.MOCMaxLinks + " or more links "
-		}
-
-		let visual = "";
-		if(this.plugin.settings.enableHighContrast) {
-			visual = "✔ High-Contrast ";
-		}
-
-		formDiv.createEl("p", {text: via + " " + avoid + " " + visual, cls: 'discovery-settings' });
 	}
 
 	onClose() {
