@@ -186,7 +186,7 @@ class SearchModal extends Modal {
 		let {contentEl} = this;
 		contentEl.createEl("h2", {text: "Find the Story Between Two Notes"});
 		this.formDiv = contentEl.createDiv({cls: 'journey-search-form'})
-
+		
 		this.setupFileList();
 		this.addStartSearchComponent();
 		this.addEndSearchComponent();
@@ -207,7 +207,7 @@ class SearchModal extends Modal {
 	private addSearchSettingsDisplay() {
 		// add showing which settings are on
 		this.formDiv.createEl("br");
-		let via: string = "";
+		let via: string = "Settings: ";
 		if (this.plugin.settings.useForwardLinks) {
 			via += "✔ Forwardlinks ";
 		}
@@ -220,7 +220,7 @@ class SearchModal extends Modal {
 
 		let avoid = "";
 		if (this.plugin.settings.skipMOCs) {
-			avoid = "✔ MOCs with " + this.plugin.settings.MOCMaxLinks + " or more links "
+			avoid = "✔ Avoid notes with " + this.plugin.settings.MOCMaxLinks + " or more links "
 		}
 
 		let visual = "";
@@ -258,6 +258,7 @@ class SearchModal extends Modal {
 
 	private addEndSearchComponent() {
 		this.searchEnd = new TextComponent(this.formDiv);
+		this.searchEnd.setPlaceholder("Your Ending Note Title")
 		let autocompleteResultEnd = this.formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
 		this.searchEnd.onChange(value => {
 			this.autocomplete(value, autocompleteResultEnd, this.searchEnd);
@@ -266,6 +267,7 @@ class SearchModal extends Modal {
 
 	private addStartSearchComponent() {
 		this.searchStart = new TextComponent(this.formDiv);
+		this.searchStart.setPlaceholder("Your Starting Note Title")
 		let autocompleteResultStart = this.formDiv.createDiv({cls: 'journey-search-autocomplete-results-container hide-me'});
 		this.searchStart.onChange(value => {
 			this.autocomplete(value, autocompleteResultStart, this.searchStart);
