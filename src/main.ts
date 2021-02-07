@@ -73,7 +73,7 @@ export default class JourneyPlugin extends Plugin {
 					// allow backlinks
 					if(this.settings.useBackLinks) {
 						console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
-						g.setEdge(target, targetClean);
+						g.setEdge(targetClean, nodeBasename);
 					}
 				}
 			} else {
@@ -95,7 +95,6 @@ export default class JourneyPlugin extends Plugin {
 						console.log("Adding Tag node" + tag)
 						g.setNode(tag);
 					}
-
 					if(!g.hasEdge(nodeBasename, tag)) {
 						console.log("Adding edge " + nodeBasename + " -> " + tag);
 						g.setEdge(nodeBasename, tag);
