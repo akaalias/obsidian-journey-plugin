@@ -34,9 +34,6 @@ export default class JourneyPlugin extends Plugin {
 		});
 	}
 
-	onunload() {
-	}
-
 	public async findShortestPath(start: string, end: string) {
 
 		const startBasename = start;
@@ -44,7 +41,6 @@ export default class JourneyPlugin extends Plugin {
 
 		console.log("Searching for journey between " + startBasename + " and " + endBasename);
 
-		let skipFolder = "Daily Notes/"
 		let resolvedLinks = this.app.metadataCache.resolvedLinks;
 
 		// configure directed true/false
@@ -54,8 +50,13 @@ export default class JourneyPlugin extends Plugin {
 			let filePath = key;
 			let nodeBasename = filePath // filePath.replace(".md", "");
 
+			if(nodeBasename.contains(this.settings.skipFolders)) {
+				console.log("Skipping adding " + nodeBasename + " as node");
+				continue;
+			}
+
 			g.setNode(nodeBasename);
-			console.log("Creating node " + nodeBasename);
+			// console.log("Creating node " + nodeBasename);
 
 			let valueMap = resolvedLinks[key];
 
@@ -65,14 +66,19 @@ export default class JourneyPlugin extends Plugin {
 					let target = linkKey;
 					let targetClean = target // target.replace(".md", "");
 
+					if(targetClean.contains(this.settings.skipFolders)) {
+						console.log("Skipping adding " + nodeBasename + " as target");
+						continue;
+					}
+
 					if(this.settings.useForwardLinks) {
-						console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
+						// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
 						g.setEdge(nodeBasename, targetClean);
 					}
 
 					// allow backlinks
 					if(this.settings.useBackLinks) {
-						console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
+						// console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
 						g.setEdge(targetClean, nodeBasename);
 					}
 				}
@@ -92,15 +98,15 @@ export default class JourneyPlugin extends Plugin {
 					tag = tag.trim();
 
 					if(!g.hasNode(tag)) {
-						console.log("Adding Tag node" + tag)
+						// console.log("Adding Tag node" + tag)
 						g.setNode(tag);
 					}
 					if(!g.hasEdge(nodeBasename, tag)) {
-						console.log("Adding edge " + nodeBasename + " -> " + tag);
+						// console.log("Adding edge " + nodeBasename + " -> " + tag);
 						g.setEdge(nodeBasename, tag);
 					}
 					if(!g.hasEdge(tag, nodeBasename)) {
-						console.log("Adding edge " + tag + " -> " + nodeBasename);
+						// console.log("Adding edge " + tag + " -> " + nodeBasename);
 						g.setEdge(tag, nodeBasename);
 					}
 				}
@@ -187,9 +193,15 @@ class SearchModal extends Modal {
 	private setupFileList() {
 		let resolvedLinks = this.app.metadataCache.resolvedLinks;
 		this.filePathList = [];
-
+		console.log("Skip: " + this.plugin.settings.skipFolders);
 		for (let key in resolvedLinks) {
 			let filePath = key;
+
+			if(filePath.contains(this.plugin.settings.skipFolders)) {
+				console.log("Skipping adding " + filePath + " as search option");
+				continue;
+			}
+
 			this.filePathList.push(filePath);
 		}
 	}
@@ -432,6 +444,7 @@ class JourneyPluginSettings {
 	public skipMOCs: boolean;
 	public MOCMaxLinks: number;
 	public enableHighContrast: boolean;
+	public skipFolders: string;
 
 	constructor() {
 		this.useForwardLinks = true;
@@ -440,6 +453,7 @@ class JourneyPluginSettings {
 		this.skipMOCs = false;
 		this.MOCMaxLinks = 30;
 		this.enableHighContrast = false;
+		this.skipFolders = "Daily Notes/";
 	}
 }
 
