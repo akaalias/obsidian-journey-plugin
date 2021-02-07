@@ -1,8 +1,21 @@
 ## Obsidian Journey Plugin
 ### Discover the story between your notes!
 
-![Map](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/map.png)
+![Map](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/map.png | width=300)
 
+## How to use this plugin - Walkthrough
+
+- Video TBD!
+
+## Main Discussion
+
+https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153
+
+## Feature Backlog is Here!
+
+https://trello.com/b/ICKWjoBu/obsidian-journey-plugin-backlog
+
+## My Background
 Hey there, Alexis here! 
 
 I’ve put together this new plugin and I would like to share with you. 
@@ -27,6 +40,7 @@ Cheers and let me know what you think!
 
 [![](https://github.com/akaalias/obsidian-journey-plugin/blob/master/journey-thumbnail.png?raw=true)](https://www.youtube.com/watch?v=iRydNlinRlc)
 
+## Deep-Dive into the individual settings
 ### What features are included:
 
 Based on the [amazing community feedback and comments](https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153), I realized that there are many different ways to go on that journey and so I've created a bunch of features you can toggle on or of to your liking. 
@@ -106,8 +120,3 @@ A sub-feature for "taking the scenic route" where you can define at what amount 
 
 A huge shout-out to [thoresson](https://forum.obsidian.md/u/thoresson), [alltagsverstand](https://forum.obsidian.md/u/alltagsverstand), [Thecookiemomma](https://forum.obsidian.md/u/Thecookiemomma), [cestvrai](https://forum.obsidian.md/u/cestvrai), [matteor](https://forum.obsidian.md/u/matteor), [Danashafir](https://forum.obsidian.md/u/Danashafir), [EhuddRomero](https://forum.obsidian.md/u/EhuddRomero), [I-d-as](https://forum.obsidian.md/u/I-d-as), [osgav](https://forum.obsidian.md/u/osgav), [Erick_James_Dodge](https://forum.obsidian.md/u/Erick_James_Dodge), [3mbry0](https://forum.obsidian.md/u/3mbry0), [Klaas](https://forum.obsidian.md/u/Klaas), [ryanjamurphy](https://forum.obsidian.md/u/ryanjamurphy), [EdElgar](https://forum.obsidian.md/u/EdElgar) and [Daveb08](https://forum.obsidian.md/u/Daveb08) for helping making this awesome for everyone!
 
-## Backlog
-
-- Bug: Fix hashtags found in URLs
-- Feature: Exclude folders
-- Refactor: Use resolvedLinks

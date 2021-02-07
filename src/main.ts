@@ -50,9 +50,14 @@ export default class JourneyPlugin extends Plugin {
 			let filePath = key;
 			let nodeBasename = filePath // filePath.replace(".md", "");
 
-			if(nodeBasename.contains(this.settings.skipFolders)) {
-				console.log("Skipping adding " + nodeBasename + " as node");
-				continue;
+			// skipping/excluding node creation based on folders
+			if(this.settings.skipFoldersList().length > 0) {
+				for(var i = 0; i <= this.settings.skipFoldersList().length; i++) {
+					if(nodeBasename.contains(this.settings.skipFoldersList()[i])) {
+						// console.log("Skipping adding " + nodeBasename + " as node");
+						continue;
+					}
+				}
 			}
 
 			g.setNode(nodeBasename);
@@ -64,11 +69,16 @@ export default class JourneyPlugin extends Plugin {
 				// look at each link
 				for(let linkKey in valueMap) {
 					let target = linkKey;
-					let targetClean = target // target.replace(".md", "");
+					let targetClean = target
 
-					if(targetClean.contains(this.settings.skipFolders)) {
-						console.log("Skipping adding " + nodeBasename + " as target");
-						continue;
+					// exclude/skip folders forward/backward link
+					if(this.settings.skipFoldersList().length > 0) {
+						for(var i = 0; i <= this.settings.skipFoldersList().length; i++) {
+							if(targetClean.contains(this.settings.skipFoldersList()[i])) {
+								// console.log("Skipping adding " + targetClean + " as target");
+								continue;
+							}
+						}
 					}
 
 					if(this.settings.useForwardLinks) {
@@ -83,7 +93,7 @@ export default class JourneyPlugin extends Plugin {
 					}
 				}
 			} else {
-				console.log("Skipping edge creation for " + nodeBasename + " with too many (" + valueMap.length + "/" + this.settings.MOCMaxLinks + ") links");
+				// console.log("Skipping edge creation for " + nodeBasename + " with too many (" + valueMap.length + "/" + this.settings.MOCMaxLinks + ") links");
 			}
 
 			if(this.settings.useTags) {
@@ -153,6 +163,7 @@ export default class JourneyPlugin extends Plugin {
 				this.settings.skipMOCs = loadedSettings.skipMOCs;
 				this.settings.MOCMaxLinks = loadedSettings.MOCMaxLinks;
 				this.settings.enableHighContrast = loadedSettings.enableHighContrast;
+				this.settings.skipFolders = loadedSettings.skipFolders;
 			} else {
 				this.saveData(this.settings);
 			}
@@ -186,6 +197,7 @@ class SearchModal extends Modal {
 	}
 
 	private findRandomNoteBasename() {
+		console.log(this.filePathList);
 		const rand = Math.floor(Math.random() * this.filePathList.length) + 1
 		return this.filePathList[rand];
 	}
@@ -193,16 +205,24 @@ class SearchModal extends Modal {
 	private setupFileList() {
 		let resolvedLinks = this.app.metadataCache.resolvedLinks;
 		this.filePathList = [];
-		console.log("Skip: " + this.plugin.settings.skipFolders);
+
 		for (let key in resolvedLinks) {
 			let filePath = key;
 
-			if(filePath.contains(this.plugin.settings.skipFolders)) {
-				console.log("Skipping adding " + filePath + " as search option");
-				continue;
+			// exclude folders if set
+			if(this.plugin.settings.skipFoldersList().length > 0) {
+				for(var i = 0; i < this.plugin.settings.skipFoldersList().length; i++) {
+					if(filePath.contains(this.plugin.settings.skipFoldersList()[i])) {
+						console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
+						break;
+					} else {
+						this.filePathList.push(filePath);
+						break;
+					}
+				}
+			} else {
+				this.filePathList.push(filePath);
 			}
-
-			this.filePathList.push(filePath);
 		}
 	}
 
@@ -230,7 +250,12 @@ class SearchModal extends Modal {
 			visual = "✔ High-Contrast ";
 		}
 
-		this.formDiv.createEl("p", {text: via + " " + avoid + " " + visual, cls: 'discovery-settings'});
+		let excludeSkip = ""
+		if (this.plugin.settings.skipFoldersList().length > 0) {
+			excludeSkip = "✔ Skipping " + this.plugin.settings.skipFolders + " ";
+		}
+
+		this.formDiv.createEl("p", {text: via + " " + avoid + " " + visual + " " + excludeSkip, cls: 'discovery-settings'});
 	}
 
 	private addLuckyButton() {
@@ -288,6 +313,9 @@ class SearchModal extends Modal {
 			autocompleteResult.addClass("hide-me");
 			return;
 		}
+
+		// console.log("Here are the files for auto-complete:");
+		// console.log(this.filePathList);
 
 		let searchResults = [];
 
@@ -453,7 +481,14 @@ class JourneyPluginSettings {
 		this.skipMOCs = false;
 		this.MOCMaxLinks = 30;
 		this.enableHighContrast = false;
-		this.skipFolders = "Daily Notes/";
+		this.skipFolders = "";
+	}
+
+	skipFoldersList() {
+		if (this.skipFolders == undefined) return [];
+		return this.skipFolders.split(",").map(function(item) {
+			return item.trim();
+		});
 	}
 }
 
@@ -505,7 +540,7 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 				}),
 			);
 
-		containerEl.createEl("h3", {text: "Avoid traveling via certain notes"});
+		containerEl.createEl("h3", {text: "Avoid traveling via certain notes and folders"});
 
 		new Setting(containerEl)
 			.setName("Take the scenic route")
@@ -528,6 +563,20 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 				}),
 			);
 		this.MOCMaxLinksCounter = containerEl.createDiv({cls: 'moc-max-links-counter', text: "Max link count: " + this.plugin.settings.MOCMaxLinks});
+
+
+		new Setting(containerEl)
+			.setName("Exclude folders")
+			.setDesc("If set, will note include notes from the specified folders in your search. Please use comma to deliminate several folders")
+			.addText((text) =>
+				text
+					.setPlaceholder("Daily Notes/, Attachments/")
+					.setValue(this.plugin.settings.skipFolders)
+					.onChange((value) => {
+						this.plugin.settings.skipFolders = value;
+						this.plugin.saveData(this.plugin.settings);
+					})
+			);
 
 		containerEl.createEl("h3", {text: "Visual Settings"});
 
