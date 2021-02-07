@@ -15,7 +15,7 @@ https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes
 
 https://trello.com/b/ICKWjoBu/obsidian-journey-plugin-backlog
 
-![Trello](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/trello.png)
+![Trello](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/trello-new.png)
 
 ## My Background
 Hey there, Alexis here! 
