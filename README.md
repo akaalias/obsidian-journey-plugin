@@ -1,7 +1,7 @@
 ## Obsidian Journey Plugin
 ### Discover the story between your notes!
 
-![Map](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/map.png | width=300)
+![Map](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/map.png)
 
 ## How to use this plugin - Walkthrough
 
