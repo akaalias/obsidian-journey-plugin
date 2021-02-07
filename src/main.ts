@@ -208,7 +208,7 @@ class SearchModal extends Modal {
 	}
 
 	private findRandomNoteBasename() {
-		console.log(this.filePathList);
+		// console.log(this.filePathList);
 		const rand = Math.floor(Math.random() * this.filePathList.length) + 1
 		return this.filePathList[rand];
 	}
@@ -226,7 +226,7 @@ class SearchModal extends Modal {
 				for(var i = 0; i < this.plugin.settings.skipFoldersList().length; i++) {
 					if(filePath.contains(this.plugin.settings.skipFoldersList()[i])) {
 						clean = false;
-						console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
+						// console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
 					}
 				}
 
@@ -322,7 +322,7 @@ class SearchModal extends Modal {
 		let autocompleteResultContent = createDiv({cls: 'journey-search-autocomplete-results-content'});
 		autocompleteResult.appendChild(autocompleteResultContent);
 
-		console.log("Searching for:" + value);
+		// console.log("Searching for:" + value);
 		if(!(value.length > 3)) {
 			autocompleteResult.addClass("hide-me");
 			return;
@@ -472,7 +472,7 @@ class ResultsModal extends Modal {
 
 		// @ts-ignore
 		this.results.forEach(function(x) {
-			result += "- " + x + "\n";
+			result += "- " + x.replace(".md", "") + "\n";
 		});
 
 		return result;
