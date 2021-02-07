@@ -71,7 +71,14 @@ export default class JourneyPlugin extends Plugin {
 
 			let valueMap = resolvedLinks[key];
 
-			if(!this.settings.skipMOCs || !(valueMap.length > this.settings.MOCMaxLinks)) {
+			let outboundLinkCounter = 0;
+			if(this.settings.skipMOCs) {
+				for(let linkKey in valueMap) {
+					outboundLinkCounter++;
+				}
+			}
+
+			if(!this.settings.skipMOCs || !(outboundLinkCounter > this.settings.MOCMaxLinks)) {
 				// look at each link
 				for(let linkKey in valueMap) {
 					let target = linkKey;
@@ -104,7 +111,7 @@ export default class JourneyPlugin extends Plugin {
 					}
 				}
 			} else {
-				// console.log("Skipping edge creation for " + nodeBasename + " with too many (" + valueMap.length + "/" + this.settings.MOCMaxLinks + ") links");
+				console.log("Skipping edge creation for " + nodeBasename + " with too many (" + outboundLinkCounter + "/" + this.settings.MOCMaxLinks + ") links");
 			}
 
 			if(this.settings.useTags) {
@@ -227,7 +234,7 @@ class SearchModal extends Modal {
 				for(var i = 0; i < this.plugin.settings.skipFoldersList().length; i++) {
 					if(filePath.contains(this.plugin.settings.skipFoldersList()[i])) {
 						clean = false;
-						console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
+						// console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
 					}
 				}
 
@@ -415,10 +422,15 @@ class ResultsModal extends Modal {
 				explanationList.createEl('li', {text: 'You currently have skipping MOCs with more than ' + this.plugin.settings.MOCMaxLinks + ' outbound links enabled'});
 			}
 
+			if(this.plugin.settings.skipFolders) {
+				explanationList.createEl('li', {text: 'You currently have skipping folders enabled'});
+			}
+
 			explanationList.createEl('li', {text: 'The two notes may not be in the same network.'});
 
 			noSearchResult.appendChild(explanationList);
 			noSearchResult.appendChild(anotherSearch);
+
 			contentEl.replaceWith(noSearchResult);
 		} else {
 			let listClass = 'journey-result-list';
