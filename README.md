@@ -105,3 +105,9 @@ In the following example, with this feature turned ON, the path from A to C woul
 A sub-feature for "taking the scenic route" where you can define at what amount of links inside a note makes it an MOC to avoid. 
 
 A huge shout-out to [thoresson](https://forum.obsidian.md/u/thoresson), [alltagsverstand](https://forum.obsidian.md/u/alltagsverstand), [Thecookiemomma](https://forum.obsidian.md/u/Thecookiemomma), [cestvrai](https://forum.obsidian.md/u/cestvrai), [matteor](https://forum.obsidian.md/u/matteor), [Danashafir](https://forum.obsidian.md/u/Danashafir), [EhuddRomero](https://forum.obsidian.md/u/EhuddRomero), [I-d-as](https://forum.obsidian.md/u/I-d-as), [osgav](https://forum.obsidian.md/u/osgav), [Erick_James_Dodge](https://forum.obsidian.md/u/Erick_James_Dodge), [3mbry0](https://forum.obsidian.md/u/3mbry0), [Klaas](https://forum.obsidian.md/u/Klaas), [ryanjamurphy](https://forum.obsidian.md/u/ryanjamurphy), [EdElgar](https://forum.obsidian.md/u/EdElgar) and [Daveb08](https://forum.obsidian.md/u/Daveb08) for helping making this awesome for everyone!
+
+## Backlog
+
+- Bug: Fix hashtags found in URLs
+- Feature: Exclude folders
+- Refactor: Use resolvedLinks

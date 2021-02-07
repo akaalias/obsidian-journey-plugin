@@ -44,56 +44,44 @@ export default class JourneyPlugin extends Plugin {
 
 		console.log("Searching for journey between " + startBasename + " and " + endBasename);
 
-		// get md files
-		let mdFiles = this.app.vault.getMarkdownFiles();
+		let skipFolder = "Daily Notes/"
+		let resolvedLinks = this.app.metadataCache.resolvedLinks;
 
 		// configure directed true/false
 		var g = new Graph({ });
 
-		for (const md of mdFiles) {
-			const nodeBasename = md.basename;
+		for (let key in resolvedLinks) {
+			let filePath = key;
+			let nodeBasename = filePath // filePath.replace(".md", "");
+
 			g.setNode(nodeBasename);
+			console.log("Creating node " + nodeBasename);
 
-			// console.log("Creating node " + nodeBasename);
-			let text = await this.app.vault.adapter.read(md.path);
+			let valueMap = resolvedLinks[key];
 
-			// @ts-ignore
-			const result = text.matchAll(/\[\[(.*)\]\]/gmi); // only clean links for now
-
-			const r = Array.from(result);
-
-			// console.log(this.settings.MOCMaxLinks);
-
-			if(!this.settings.skipMOCs || !(r.length > this.settings.MOCMaxLinks)) {
-
-				for(var i = 0; i < r.length; i++) {
-					let x = r[i];
-
-					// @ts-ignore
-					let target = x[1];
-
-					if(target.indexOf("#") != -1) target = target.substring(0, target.indexOf("#"))
-					if(target.indexOf("|") != -1) target = target.substring(0, target.indexOf("|"))
-					if(target.indexOf("^") != -1) target = target.substring(0, target.indexOf("^"))
-
-					target = target.trim();
+			if(!this.settings.skipMOCs || !(valueMap.length > this.settings.MOCMaxLinks)) {
+				// look at each link
+				for(let linkKey in valueMap) {
+					let target = linkKey;
+					let targetClean = target // target.replace(".md", "");
 
 					if(this.settings.useForwardLinks) {
-						// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
-						g.setEdge(nodeBasename, target);
+						console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
+						g.setEdge(nodeBasename, targetClean);
 					}
 
 					// allow backlinks
 					if(this.settings.useBackLinks) {
-						// console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
-						g.setEdge(target, nodeBasename);
+						console.log("     Adding BACKLINK edge " + target + " -> " + nodeBasename);
+						g.setEdge(target, targetClean);
 					}
 				}
 			} else {
-				console.log("Skipping edge creation for " + nodeBasename + " with too many (" + r.length + "/" + this.settings.MOCMaxLinks + ") links");
+				console.log("Skipping edge creation for " + nodeBasename + " with too many (" + valueMap.length + "/" + this.settings.MOCMaxLinks + ") links");
 			}
 
 			if(this.settings.useTags) {
+				const text = await this.app.vault.adapter.read(filePath);
 				// @ts-ignore
 				const result = text.matchAll(/\#\w+/gmi);
 				const ts = Array.from(result);
@@ -104,24 +92,21 @@ export default class JourneyPlugin extends Plugin {
 					tag = tag.trim();
 
 					if(!g.hasNode(tag)) {
-						// console.log("Adding Tag node" + tag)
+						console.log("Adding Tag node" + tag)
 						g.setNode(tag);
 					}
 
 					if(!g.hasEdge(nodeBasename, tag)) {
-						// console.log("Adding edge " + nodeBasename + " -> " + tag);
+						console.log("Adding edge " + nodeBasename + " -> " + tag);
 						g.setEdge(nodeBasename, tag);
 					}
 					if(!g.hasEdge(tag, nodeBasename)) {
-						// console.log("Adding edge " + tag + " -> " + nodeBasename);
+						console.log("Adding edge " + tag + " -> " + nodeBasename);
 						g.setEdge(tag, nodeBasename);
 					}
 				}
 			}
 		}
-
-		// const components = graphlib.alg.components(g);
-		// console.log(components);
 
 		const searchResult = graphlib.alg.dijkstra(g, startBasename);
 
@@ -172,7 +157,7 @@ export default class JourneyPlugin extends Plugin {
 
 class SearchModal extends Modal {
 	private plugin: JourneyPlugin;
-	private markdownFiles: any[];
+	private filePathList: string[];
 	private searchStart: TextComponent;
 	private searchEnd: TextComponent;
 	private formDiv: HTMLDivElement;
@@ -196,12 +181,18 @@ class SearchModal extends Modal {
 	}
 
 	private findRandomNoteBasename() {
-		const rand = Math.floor(Math.random() * this.markdownFiles.length) + 1
-		return this.markdownFiles[rand].basename;
+		const rand = Math.floor(Math.random() * this.filePathList.length) + 1
+		return this.filePathList[rand];
 	}
 
 	private setupFileList() {
-		this.markdownFiles = this.app.vault.getMarkdownFiles();
+		let resolvedLinks = this.app.metadataCache.resolvedLinks;
+		this.filePathList = [];
+
+		for (let key in resolvedLinks) {
+			let filePath = key;
+			this.filePathList.push(filePath);
+		}
 	}
 
 	private addSearchSettingsDisplay() {
@@ -289,10 +280,10 @@ class SearchModal extends Modal {
 
 		let searchResults = [];
 
-		for(var i = 0; i < this.markdownFiles.length; i++) {
-			if(this.markdownFiles[i].basename.toUpperCase().includes(value.toUpperCase())) {
+		for(var i = 0; i < this.filePathList.length; i++) {
+			if(this.filePathList[i].toUpperCase().includes(value.toUpperCase())) {
 				// console.log("Found: " + this.markdownFiles[i].basename);
-				searchResults.push(this.markdownFiles[i].basename);
+				searchResults.push(this.filePathList[i]);
 			}
 		}
 
