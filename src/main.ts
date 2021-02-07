@@ -52,11 +52,17 @@ export default class JourneyPlugin extends Plugin {
 
 			// skipping/excluding node creation based on folders
 			if(this.settings.skipFoldersList().length > 0) {
+				var clean = true;
 				for(var i = 0; i <= this.settings.skipFoldersList().length; i++) {
 					if(nodeBasename.contains(this.settings.skipFoldersList()[i])) {
 						// console.log("Skipping adding " + nodeBasename + " as node");
-						continue;
+						clean = false;
 					}
+				}
+
+				// skip this loop
+				if(!clean) {
+					continue;
 				}
 			}
 
@@ -73,13 +79,18 @@ export default class JourneyPlugin extends Plugin {
 
 					// exclude/skip folders forward/backward link
 					if(this.settings.skipFoldersList().length > 0) {
+						var clean = true;
 						for(var i = 0; i <= this.settings.skipFoldersList().length; i++) {
 							if(targetClean.contains(this.settings.skipFoldersList()[i])) {
-								// console.log("Skipping adding " + targetClean + " as target");
-								continue;
+								clean = false;
 							}
 						}
+
+						if(!clean) {
+							continue;
+						}
 					}
+
 
 					if(this.settings.useForwardLinks) {
 						// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
@@ -211,14 +222,17 @@ class SearchModal extends Modal {
 
 			// exclude folders if set
 			if(this.plugin.settings.skipFoldersList().length > 0) {
+				var clean = true;
 				for(var i = 0; i < this.plugin.settings.skipFoldersList().length; i++) {
 					if(filePath.contains(this.plugin.settings.skipFoldersList()[i])) {
+						clean = false;
 						console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
-						break;
-					} else {
-						this.filePathList.push(filePath);
-						break;
 					}
+				}
+
+				// if it's still clean...
+				if(clean) {
+					this.filePathList.push(filePath);
 				}
 			} else {
 				this.filePathList.push(filePath);
