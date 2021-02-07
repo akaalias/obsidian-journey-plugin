@@ -39,7 +39,7 @@ export default class JourneyPlugin extends Plugin {
 		const startBasename = start;
 		const endBasename = end;
 
-		console.log("Searching for journey between " + startBasename + " and " + endBasename);
+		// console.log("Searching for journey between " + startBasename + " and " + endBasename);
 
 		let resolvedLinks = this.app.metadataCache.resolvedLinks;
 
@@ -111,7 +111,7 @@ export default class JourneyPlugin extends Plugin {
 					}
 				}
 			} else {
-				console.log("Skipping edge creation for " + nodeBasename + " with too many (" + outboundLinkCounter + "/" + this.settings.MOCMaxLinks + ") links");
+				// console.log("Skipping edge creation for " + nodeBasename + " with too many (" + outboundLinkCounter + "/" + this.settings.MOCMaxLinks + ") links");
 			}
 
 			if(this.settings.useTags) {
@@ -223,7 +223,7 @@ class SearchModal extends Modal {
 	private setupFileList() {
 		let resolvedLinks = this.app.metadataCache.resolvedLinks;
 		this.filePathList = [];
-		console.log(this.plugin.settings.skipFoldersList());
+		// console.log(this.plugin.settings.skipFoldersList());
 
 		for (let key in resolvedLinks) {
 			let filePath = key;
