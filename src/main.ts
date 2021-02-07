@@ -216,6 +216,7 @@ class SearchModal extends Modal {
 	private setupFileList() {
 		let resolvedLinks = this.app.metadataCache.resolvedLinks;
 		this.filePathList = [];
+		console.log(this.plugin.settings.skipFoldersList());
 
 		for (let key in resolvedLinks) {
 			let filePath = key;
@@ -226,7 +227,7 @@ class SearchModal extends Modal {
 				for(var i = 0; i < this.plugin.settings.skipFoldersList().length; i++) {
 					if(filePath.contains(this.plugin.settings.skipFoldersList()[i])) {
 						clean = false;
-						// console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
+						console.log("Skipping adding " + filePath + " as search option because " + this.plugin.settings.skipFoldersList()[i]);
 					}
 				}
 
@@ -499,7 +500,7 @@ class JourneyPluginSettings {
 	}
 
 	skipFoldersList() {
-		if (this.skipFolders == undefined) return [];
+		if (this.skipFolders == undefined || this.skipFolders == "") return [];
 		return this.skipFolders.split(",").map(function(item) {
 			return item.trim();
 		});
