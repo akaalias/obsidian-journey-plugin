@@ -117,7 +117,7 @@ export default class JourneyPlugin extends Plugin {
 			if(this.settings.useTags) {
 				const text = await this.app.vault.adapter.read(filePath);
 				// @ts-ignore
-				const result = text.matchAll(/\#\w+/gmi);
+				const result = text.matchAll(/\#[\w|äÄöÖüÜß\/\-\_]+/gmi);
 				const ts = Array.from(result);
 
 				for(var i = 0; i < ts.length; i++) {
