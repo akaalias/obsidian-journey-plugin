@@ -1,8 +1,6 @@
 ## Obsidian Journey Plugin
 ### Discover the story between your notes!
 
-![Map](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/map.png)
-
 ## How to use this plugin - Walkthrough
 
 [![](https://github.com/akaalias/obsidian-journey-plugin/blob/master/First-Time-Usage.png?raw=true)](https://youtu.be/6k2Lp1pCZpY)
@@ -18,6 +16,9 @@ https://trello.com/b/ICKWjoBu/obsidian-journey-plugin-backlog
 ![Trello](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/trello-new.png)
 
 ## My Background
+
+![Map](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/map.png)
+
 Hey there, Alexis here! 
 
 I’ve put together this new plugin and I would like to share with you. 
@@ -39,8 +40,6 @@ So that’s what this is about. Find the connection between two notes in my vaul
 Here’s a quick video with a demo if you’re interested:
 
 Cheers and let me know what you think!
-
-[![](https://github.com/akaalias/obsidian-journey-plugin/blob/master/journey-thumbnail.png?raw=true)](https://www.youtube.com/watch?v=iRydNlinRlc)
 
 ## Deep-Dive into the individual settings
 ### What features are included:
