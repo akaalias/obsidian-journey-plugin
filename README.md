@@ -5,7 +5,7 @@
 
 ## How to use this plugin - Walkthrough
 
-- Video TBD!
+[![](https://github.com/akaalias/obsidian-journey-plugin/blob/master/First-Time-Usage.png?raw=true)](https://youtu.be/6k2Lp1pCZpY)
 
 ## Main Discussion
 
