@@ -98,7 +98,6 @@ export default class JourneyPlugin extends Plugin {
 						}
 					}
 
-
 					if(this.settings.useForwardLinks) {
 						// console.log("     Adding FORWARDLINK edge " + nodeBasename + " -> " + target);
 						g.setEdge(nodeBasename, targetClean);
@@ -182,6 +181,8 @@ export default class JourneyPlugin extends Plugin {
 				this.settings.MOCMaxLinks = loadedSettings.MOCMaxLinks;
 				this.settings.enableHighContrast = loadedSettings.enableHighContrast;
 				this.settings.skipFolders = loadedSettings.skipFolders;
+				this.settings.enableLinks = loadedSettings.enableLinks;
+				this.settings.enableTransclusion = loadedSettings.enableTransclusion;
 			} else {
 				this.saveData(this.settings);
 			}
@@ -481,12 +482,25 @@ class ResultsModal extends Modal {
 	}
 
 	createClipboardContent(): string {
-		let result = "## The Journey Between " + this.results.first()  + " and " + this.results.last() + "\n";
+		let result = "## The Journey Between " + this.results.first().replace(".md", "")  + " and " + this.results.last().replace(".md", "") + "\n";
 
-		// @ts-ignore
-		this.results.forEach(function(x) {
-			result += "- " + x.replace(".md", "") + "\n";
-		});
+		for(var i = 0; i < this.results.length; i++) {
+			let noteTitle = this.results[i].replace(".md", "");
+
+			if(this.plugin.settings.enableLinks && !(noteTitle.startsWith("#"))) {
+				noteTitle = "[[" + noteTitle + "]]";
+			}
+
+			if(this.plugin.settings.enableLinks && this.plugin.settings.enableTransclusion) {
+				if(!(noteTitle.startsWith("#"))) {
+					result += "!" + noteTitle + "\n";
+				} else {
+					result += noteTitle + "\n";
+				}
+			} else {
+				result += "- " + noteTitle + "\n";
+			}
+		}
 
 		return result;
 	}
@@ -500,6 +514,8 @@ class JourneyPluginSettings {
 	public MOCMaxLinks: number;
 	public enableHighContrast: boolean;
 	public skipFolders: string;
+	public enableLinks: boolean;
+	public enableTransclusion: boolean;
 
 	constructor() {
 		this.useForwardLinks = true;
@@ -509,6 +525,8 @@ class JourneyPluginSettings {
 		this.MOCMaxLinks = 30;
 		this.enableHighContrast = false;
 		this.skipFolders = "";
+		this.enableLinks = false;
+		this.enableTransclusion = false;
 	}
 
 	skipFoldersList() {
@@ -605,7 +623,29 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 					})
 			);
 
-		containerEl.createEl("h3", {text: "Visual Settings"});
+		containerEl.createEl("h3", {text: "Clipboard Settings"});
+
+		new Setting(containerEl)
+			.setName("Enable Automatic Linking")
+			.setDesc("If set, will turn titles in the list into links to their respective note")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.enableLinks).onChange((value) => {
+					this.plugin.settings.enableLinks = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
+
+		new Setting(containerEl)
+			.setName("Enable Automatic Transclusion")
+			.setDesc("If set, will automatically create transcluding links for you ('![[note]]' instead of '- [[note]]')")
+			.addToggle((toggle) =>
+				toggle.setValue(this.plugin.settings.enableTransclusion).onChange((value) => {
+					this.plugin.settings.enableTransclusion = value;
+					this.plugin.saveData(this.plugin.settings);
+				}),
+			);
+
+		containerEl.createEl("h3", {text: "Accessibility Settings"});
 
 		new Setting(containerEl)
 			.setName("Enable High Contrast")
@@ -616,9 +656,5 @@ class JourneyPluginSettingsTab extends PluginSettingTab {
 					this.plugin.saveData(this.plugin.settings);
 				}),
 			);
-
-
 	}
 }
-
-new Notice("Journey Re-Loaded!");
