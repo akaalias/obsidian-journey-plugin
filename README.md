@@ -1,57 +1,95 @@
-## Obsidian Journey Plugin
-### Discover the story between your notes!
+## Obsidian Journey Plugin - Discover the story between your notes!
 
-## How to use this plugin - Walkthrough
+Hey there and welcome!
 
-[![](https://github.com/akaalias/obsidian-journey-plugin/blob/master/First-Time-Usage.png?raw=true)](https://youtu.be/6k2Lp1pCZpY)
+Alexis here - Obsidian enthusiast and student at the University of Life! 
 
-## Main Discussion
+I want to show you a new Obsidian plugin I've been working on. 
 
-https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153
+This plugin automatically creates an outline for your publishing. 
 
-## Feature Backlog is Here!
+An outline for an article, a blog post, or even a book!
 
-https://trello.com/b/ICKWjoBu/obsidian-journey-plugin-backlog
+Why do we need this? 
 
-![Trello](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/trello-new.png)
+**I’ve noticed that my creative output using Obsidian hasn't been as prolific as I’d like it to be.** 
 
-## My Background
+I have hundreds of atomic notes in my vault, I’ve followed every best-practice, but right now, Obsidian didn’t help me take that next step.
 
-![Map](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/map.png)
+It’s really hard to extract a good story from my vault.
 
-Hey there, Alexis here! 
+This plugin automatically finds and creates the outline of my story. 
 
-I’ve put together this new plugin and I would like to share with you. 
+## Demo
 
-Basically it helps me find the stories between my notes and bootstrap the outline for a new text much faster.
+[![](./demo.png?raw=true)](https://youtu.be/iRydNlinRlc)
 
-Overall, I’ve noticed that my actual creative output hasn’t been as prolific as I would like it to be. I’ve created hundreds of atomic notes, connected them etc. 
+## Tutorial
 
-And yet I felt really stuck and didn’t know how to extract a linear story from my ‘hairball’ vault.
+[![](./First-Time-Usage.png?raw=true)](https://youtu.be/6k2Lp1pCZpY)
 
-To me, the upfront work of creating that outline is still really hard. 
-
-Plus: I KNOW it’s in there (my vault)! I just want to get to a first draft faster. 
-
-I want to spend my energy writing and editing the story. 
-
-So that’s what this is about. Find the connection between two notes in my vault to discover new ideas and help write that first draft.
-
-Here’s a quick video with a demo if you’re interested:
-
-Cheers and let me know what you think!
-
-## Deep-Dive into the individual settings
-### What features are included:
+## Included Features
 
 Based on the [amazing community feedback and comments](https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153), I realized that there are many different ways to go on that journey and so I've created a bunch of features you can toggle on or of to your liking. 
 
 These features are like preferences you can give your navigation-system in your car. Maybe today, all you care about is getting from A to B quickly. Maybe tomorrow, you have more time to "take the scenic route." I want you to be as flexible as possible.
 
-- Feature 1: Use "Forward-Links" (Enabled by default)
-- Feature 2: Use "Back-Links" (Enabled by default)
-- Feature 3: Using Tags (Disabled by default)
-- Feature 4: "Take the scenic route" aka Avoid MOCs (Disabled by default)
+### ✔ Path-Finding Features
+
+#### ➡️ Use "Forward-Links" (Enabled by default)
+If set, allows to travel using forward-links. If you have a graph like this: A -> B -> C and you ask about the story between A and C, it will give you 'A, B, C' since A forward-links to B and B forward-links to C
+
+#### ⬅️ Use "Back-Links" (Enabled by default)
+If set, allows to travel using back-links. If you have a graph like this: A -> B -> C and you ask about the story between C and A, it will give you 'C, B, A' since C has a back-link from B and B has a back-link from A
+
+### ✔ Include Tags Feature
+#### 🏷 Use tags (Disabled by default)
+If set, allows to travel using tags.
+
+### ✔ Avoid Traveling via Certain Notes Features
+#### 🏞 "Take the scenic route" (Disabled by default)
+If set, will skip 'hub' notes with too many links (MOCs). Configure exactly how many links make a MOC below.
+
+#### ⚙️ "How many links make a MOC?"
+Configure at which point to skip a note because it contains too many out-bound links. Applies only if 'Take the scenic route' above is set.
+
+#### 🙅🏻‍♀️Exclude specific folders (Disabled by default)
+If set, will note include notes from the specified folders in your search. Please use comma to deliminate several folders
+
+### ✔ Clipboard Settings Feature
+#### 🔗 Enable automatic linking (Disabled by default)
+If set, will turn titles in the list into links to their respective note
+
+#### 🤪 Enable automatic transclusion (Disabled by default)
+If set, will automatically create transcluding links for you ('![[note]]' instead of '- [[note]]')
+
+### ✔ Accessibility Feature
+#### 🔎 Enable High-Contrast
+If set, will increase the contrast to make the result-list easier to read.
+
+## Join the Discussion!
+
+Share your ideas and feedback on the plugin. We regularly vote on which features should be built next
+
+https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153
+
+[![](./voting.png?raw=true)](https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153)
+
+A huge shout-out to [thoresson](https://forum.obsidian.md/u/thoresson), [alltagsverstand](https://forum.obsidian.md/u/alltagsverstand), [Thecookiemomma](https://forum.obsidian.md/u/Thecookiemomma), [cestvrai](https://forum.obsidian.md/u/cestvrai), [matteor](https://forum.obsidian.md/u/matteor), [Danashafir](https://forum.obsidian.md/u/Danashafir), [EhuddRomero](https://forum.obsidian.md/u/EhuddRomero), [I-d-as](https://forum.obsidian.md/u/I-d-as), [osgav](https://forum.obsidian.md/u/osgav), [Erick_James_Dodge](https://forum.obsidian.md/u/Erick_James_Dodge), [3mbry0](https://forum.obsidian.md/u/3mbry0), [Klaas](https://forum.obsidian.md/u/Klaas), [ryanjamurphy](https://forum.obsidian.md/u/ryanjamurphy), [EdElgar](https://forum.obsidian.md/u/EdElgar) and [Daveb08](https://forum.obsidian.md/u/Daveb08) for helping making this awesome for everyone!
+
+## How to submit an issue
+
+🐞 If you run into a TECHNICAL ISSUE or BUG: Please submit a Github Issues at https://github.com/akaalias/obsidian-journey-plugin/issues
+
+[![](./issues.png?raw=true)](https://github.com/akaalias/obsidian-journey-plugin/issues)
+
+## See what features are coming up
+
+https://trello.com/b/ICKWjoBu/obsidian-journey-plugin-backlog
+
+![Trello](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/trello-new.png)
+
+## Path-Finding Feature Deep Dive
 
 Because each feature has an impact to whether the plugin CAN FIND or CANNOT FIND a path between your two notes, I want to demonstrate what each does as simply as possible. 
 
@@ -118,6 +156,4 @@ In the following example, with this feature turned ON, the path from A to C woul
 
 ##### "How many links make an MOC?"
 A sub-feature for "taking the scenic route" where you can define at what amount of links inside a note makes it an MOC to avoid. 
-
-A huge shout-out to [thoresson](https://forum.obsidian.md/u/thoresson), [alltagsverstand](https://forum.obsidian.md/u/alltagsverstand), [Thecookiemomma](https://forum.obsidian.md/u/Thecookiemomma), [cestvrai](https://forum.obsidian.md/u/cestvrai), [matteor](https://forum.obsidian.md/u/matteor), [Danashafir](https://forum.obsidian.md/u/Danashafir), [EhuddRomero](https://forum.obsidian.md/u/EhuddRomero), [I-d-as](https://forum.obsidian.md/u/I-d-as), [osgav](https://forum.obsidian.md/u/osgav), [Erick_James_Dodge](https://forum.obsidian.md/u/Erick_James_Dodge), [3mbry0](https://forum.obsidian.md/u/3mbry0), [Klaas](https://forum.obsidian.md/u/Klaas), [ryanjamurphy](https://forum.obsidian.md/u/ryanjamurphy), [EdElgar](https://forum.obsidian.md/u/EdElgar) and [Daveb08](https://forum.obsidian.md/u/Daveb08) for helping making this awesome for everyone!
 
