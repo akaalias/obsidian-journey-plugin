@@ -22,9 +22,13 @@ This plugin automatically finds and creates the outline of my story.
 
 ## Demo
 
+Watch on Youtube: https://youtu.be/iRydNlinRlc
+
 [![](https://github.com/akaalias/obsidian-journey-plugin/raw/master/demo.png?raw=true)](https://youtu.be/iRydNlinRlc)
 
 ## Tutorial
+
+Watch on Youtube: https://youtu.be/6k2Lp1pCZpY
 
 [![](https://github.com/akaalias/obsidian-journey-plugin/raw/master/First-Time-Usage.png?raw=true)](https://youtu.be/6k2Lp1pCZpY)
 
