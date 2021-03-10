@@ -1,5 +1,8 @@
 ## Obsidian Journey Plugin - Discover the story between your notes!
 
+![GitHub release)](https://img.shields.io/github/v/release/akaalias/obsidian-journey-plugin)
+![GitHub all releases](https://img.shields.io/github/downloads/akaalias/obsidian-journey-plugin/total)
+
 Hey there and welcome!
 
 Alexis here - Obsidian enthusiast and student at the University of Life!
