@@ -32,8 +32,9 @@ Watch on Youtube: https://youtu.be/6k2Lp1pCZpY
 
 ## Included Features
 
-![](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/graph.png)
+Basically, the plugin finds the shortest path between two notes in your vault: 
 
+![What the plugin finds for you](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/graph.png)
 
 Based on the [amazing community feedback and comments](https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153), I realized that there are many different ways to go on that journey and so I've created a bunch of features you can toggle on or of to your liking.
 
