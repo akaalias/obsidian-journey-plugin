@@ -22,7 +22,9 @@ I have hundreds of atomic notes in my vault, I’ve followed every best-practice
 
 It’s really hard to extract a good story from my vault.
 
-This plugin automatically finds and creates the outline of my story.
+This plugin automatically finds and creates the outline of my story like so: 
+
+![What the plugin finds for you](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/graph.png)
 
 ## Tutorial
 
@@ -31,10 +33,6 @@ Watch on Youtube: https://youtu.be/6k2Lp1pCZpY
 [![](https://github.com/akaalias/obsidian-journey-plugin/raw/master/First-Time-Usage.png?raw=true)](https://youtu.be/6k2Lp1pCZpY)
 
 ## Included Features
-
-Basically, the plugin finds the shortest path between two notes in your vault: 
-
-![What the plugin finds for you](https://raw.githubusercontent.com/akaalias/obsidian-journey-plugin/master/graph.png)
 
 Based on the [amazing community feedback and comments](https://forum.obsidian.md/t/new-plugin-journey-find-the-story-between-your-notes/12153), I realized that there are many different ways to go on that journey and so I've created a bunch of features you can toggle on or of to your liking.
 
